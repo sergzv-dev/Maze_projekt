@@ -15,7 +15,7 @@ def game():
     stranger = Player(name)
     master.say(f'Hello {stranger.name}')
     while True:
-        master.ask('What will you do?', stranger.options+stranger.curr_room.options)
+        master.ask('What will you do?', stranger.options + stranger.curr_room.options)
 
 
 class Action():
@@ -47,6 +47,9 @@ def map_builder(x_line, y_line):
     return rooms_list
 
 
+
+import random
+
 class Creature():
     def __iadd__(self, other):
         self.value = {key: other.get(key, lambda x: x)(value) for key, value in self.items()}
@@ -62,7 +65,7 @@ class Player(Creature):
         self.opt = []
 
     def state(self, impact):
-        self.state = modify(self.state, impact)
+        self.state += impact
         return self.state
 
     def backpack(self):
@@ -72,14 +75,6 @@ class Player(Creature):
     def options(self):
         return self.opt
 
-
-
-
-def modify(specs, modifier):
-    return {key: modifier.get(key, lambda x: x)(value) for key, value in specs.items()}
-
-
-import random
 
 class Monster(Creature):
 
@@ -117,21 +112,24 @@ class Monster(Creature):
         return self.creature
 
 
-def itm():
-    mixture = {'hp': lambda x: x+20}
-    false_key = False
-    boost_attack = {'attack': lambda x: x+10}
-    boost_shield = {'attack': lambda x: x+10}
-    boost_agility = {'agility': lambda x: x+2}
-    empty_box = None
-    key = True
-    super_shield = {'agility': lambda x: 10}
+class  Treasure(Creature):
 
-    if random.randint(1,2) == 1:
-        prize = random.choice((mixture, false_key, boost_attack, boost_shield, boost_agility))
-    elif random.randint(1,5) == 1:
-        prize = random.choice((key, super_shield))
-    else: prize = empty_box
+    def choose_treas(self):
+        mixture = {'hp': lambda x: x+20}
+        false_key = False
+        boost_attack = {'attack': lambda x: x+10}
+        boost_shield = {'attack': lambda x: x+10}
+        boost_agility = {'agility': lambda x: x+2}
+        empty_box = None
+        key = True
+        super_shield = {'agility': lambda x: 10}
 
-    return prize
+        if random.randint(1,2) == 1:
+            treas = random.choice((mixture, false_key, boost_attack, boost_shield, boost_agility))
+        elif random.randint(1,5) == 1:
+            treas = random.choice((key, super_shield))
+        else: treas = empty_box
+        return treas
 
+#def modify(specs, modifier):
+    #return {key: modifier.get(key, lambda x: x)(value) for key, value in specs.items()}
