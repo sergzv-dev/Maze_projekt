@@ -20,10 +20,10 @@ def maze_gen(x_line, y_line):
             else: array_chek += 1
 
             if random.randint(1, 3) == 1:
-                under_chek  += 1
                 under_border[num_l][num_i] = 1
                 if array_interrupt is True and array_chek == under_chek:
                     under_border[num_l][num_i] = 0
+                under_chek += 1
 
             if array_interrupt is True:
                 under_chek = 0
