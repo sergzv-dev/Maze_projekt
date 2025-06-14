@@ -81,34 +81,41 @@ def modify(specs, modifier):
 
 import random
 
-def monster():
-    soldier = {'name': 'soldier', 'attack': 15, 'shield': 10, 'hp': 30, 'agility': 2}
-    goblin = {'name': 'goblin', 'attack': 10, 'shield': 5, 'hp': 25, 'agility': 3}
-    mage = {'name': 'mage', 'attack': 20, 'shield': 5, 'hp': 20, 'agility': 5}
-    knight = {'name': 'knight', 'attack': 10, 'shield': 20, 'hp': 50, 'agility': 0}
-    mimic = {'name': 'mimic', 'attack': 30, 'shield': 5, 'hp': 15, 'agility': 0}
+class Monster(Creature):
 
-    up_monster = random.choice((soldier, goblin, mage, knight, mimic))
+    @property
+    def up_monster(self):
+        soldier = {'name': 'soldier', 'attack': 15, 'shield': 10, 'hp': 30, 'agility': 2}
+        goblin = {'name': 'goblin', 'attack': 10, 'shield': 5, 'hp': 25, 'agility': 3}
+        mage = {'name': 'mage', 'attack': 20, 'shield': 5, 'hp': 20, 'agility': 5}
+        knight = {'name': 'knight', 'attack': 10, 'shield': 20, 'hp': 50, 'agility': 0}
+        mimic = {'name': 'mimic', 'attack': 30, 'shield': 5, 'hp': 15, 'agility': 0}
+        return random.choice((soldier, goblin, mage, knight, mimic))
 
-    undead = {'name': lambda x: 'undead '+x, 'attack': lambda x: x-5, 'hp': lambda x: x+15}
-    beasty = {'name': lambda x: 'beasty '+x, 'attack': lambda x: x+5, 'agility': lambda x: x+5}
-    demonic = {'name': lambda x: 'demonic '+x, 'shield': lambda x: x+30, 'hp': lambda x: x-5}
-    frozen = {'name': lambda x: 'frozen '+x, 'hp': lambda x: x+30, 'agility': lambda x: 0}
-    cursed = {'name': lambda x: 'cursed '+x, 'attack': lambda x: x-5, 'hp': lambda x: x-10}
+    @property
+    def up_name(self):
+        undead = {'name': lambda x: 'undead '+x, 'attack': lambda x: x-5, 'hp': lambda x: x+15}
+        beasty = {'name': lambda x: 'beasty '+x, 'attack': lambda x: x+5, 'agility': lambda x: x+5}
+        demonic = {'name': lambda x: 'demonic '+x, 'shield': lambda x: x+30, 'hp': lambda x: x-5}
+        frozen = {'name': lambda x: 'frozen '+x, 'hp': lambda x: x+30, 'agility': lambda x: 0}
+        cursed = {'name': lambda x: 'cursed '+x, 'attack': lambda x: x-5, 'hp': lambda x: x-10}
+        return random.choice((undead, beasty, demonic, frozen, cursed))
 
-    up_name = random.choice((undead, beasty, demonic, frozen, cursed))
+    @property
+    def up_super(self):
+        champion = {'name': lambda x: ('champion '+x).upper(), 'shield': lambda x: x+20, 'hp': lambda x: x+20}
+        flaming = {'name': lambda x: ('flaming '+x).upper(), 'attack': lambda x: x+30}
+        furious = {'name': lambda x: ('furious '+x).upper(), 'shield': lambda x: x+30}
+        return random.choice((champion, flaming, furious))
 
-    champion = {'name': lambda x: ('champion '+x).upper(), 'shield': lambda x: x+20, 'hp': lambda x: x+20}
-    flaming = {'name': lambda x: ('flaming '+x).upper(), 'attack': lambda x: x+30}
-    furious = {'name': lambda x: ('furious '+x).upper(), 'shield': lambda x: x+30}
+    def create_monster(self):
+        self.creature = Monster.up_monster
+        if random.randint(1,2) == 1:
+            self.creature += Monster.up_name
+            if random.randint(1,5) == 1:
+                self.creature += Monster.up_super
+        return self.creature
 
-    up_super = random.choice((champion, flaming, furious))
-
-    creature = modify(up_monster, up_name)
-    if random.randint(1,10) == 1:
-        creature = modify(up_super, creature)
-
-    return creature
 
 def itm():
     mixture = {'hp': lambda x: x+20}
