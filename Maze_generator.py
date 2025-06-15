@@ -45,4 +45,4 @@ arr_print(right_border)
 print('\nunder_border\n')
 arr_print(under_border)
 
-ptint('Hello')
+print('Hello')
