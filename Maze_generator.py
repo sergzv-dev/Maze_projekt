@@ -38,10 +38,11 @@ def maze_gen(x_line, y_line):
 
     return right_border, under_border
 
-
 right_border, under_border = maze_gen(10, 15)
 
 print('\nright_border\n')
 arr_print(right_border)
 print('\nunder_border\n')
 arr_print(under_border)
+
+ptint('Hello')
