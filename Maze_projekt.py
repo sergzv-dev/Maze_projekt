@@ -17,6 +17,43 @@ def game():
     while True:
         master.ask('What will you do?', stranger.options + stranger.curr_room.options)
 
+class Game_states():
+    def __init__(self, name):
+        self.name = name
+        self.pl_state = dict()
+        self.backpack = []
+        self.curr_room = None
+
+
+class Access_state():
+    def __init__(self):
+        self.state = Game_states()
+
+    def get_name(self):
+        return self.state.name
+
+    def get_plst(self):
+        return self.state.pl_state
+
+    def change_plst(self, new_states):
+        self.state.pl_state = new_states
+
+    def get_bp(self):
+        return self.state.backpack
+
+    def add_bp(self, itm):
+        self.state.backpack = self.state.backpack + itm
+
+    def sub_bp(self, itm):
+        self.state.backpack = self.state.backpack - itm
+
+    def get_room(self):
+        return self.state.curr_room
+
+    def change_room(self, new_r):
+        self.state.curr_room = new_r
+
+
 
 class Action():
     def move(self, direction):

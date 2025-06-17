@@ -44,5 +44,3 @@ print('\nright_border\n')
 arr_print(right_border)
 print('\nunder_border\n')
 arr_print(under_border)
-
-print('Hello')
