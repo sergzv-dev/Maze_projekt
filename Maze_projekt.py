@@ -23,6 +23,8 @@ class Game_states():
         self.pl_state = dict()
         self.backpack = []
         self.curr_room = None
+        self.x_size = 0
+        self.y_size = 0
 
 
 class Access_state():
@@ -47,41 +49,71 @@ class Access_state():
     def change_bp(self, new_bp):
         self.state.backpack = new_bp
 
+    def set_x(self, x):
+        self.state.x_size = x
+
+    def get_x(self):
+        return self.state.x_size
+
+    def set_y(self, y):
+        self.state.y_size = y
+
+    def get_y(self):
+        return self.state.y_size
+
     def get_room(self):
         return self.state.curr_room
 
-    def change_room(self, new_r):
-        self.state.curr_room = new_r
-
+    def change_room(self, new_room):
+        self.state.curr_room = new_room
 
 
 class Action():
-    def move(self, direction):
-        pass
+    def __init__(self):
+        self.access = Access_state()
+
+    def move(self, new_room):
+        return self.access.change_room(new_room)
+
     def attack(self, pl_state, m_state):
         pass
     def get_itm(self, itm, pl_inv):
         pass
 
+import itertools as it
 
 class Rooms():
-    def __init__(self, let, num):
-        self.name = let + str(num)
+    def __init__(self, x, y):
+        self.access = Access_state()
+        self.name = str(x) + str(y)
+        self.x = x
+        self.y = y
         self.opt = []
         self.doors = []
+        Rooms.doors(self)
 
-    @property
     def options(self):
         return self.opt
 
     def doors(self):
-        return self.doors
+        x_option = filter(lambda num: 0 < num <= self.access.get_x(), (self.x + 1, self.x - 1,))
+        y_option = filter(lambda num: 0 < num <= self.access.get_y(), (self.y + 1, self.y - 1,))
+        self.doors = [f'{room[0]}{room[1]}' for room in it.product(x_option, y_option)]
 
-def map_builder(x_line, y_line):
-    rooms_list = dict()
-    for let in range(65, x_line+65):
-        rooms_list.update({f'{chr(let)}{str(num)}': Rooms(chr(let),num) for num in range(1, y_line+1)})
-    return rooms_list
+
+class Map_bilder():
+    def __init__(self, x_line, y_line):
+        self.access = Access_state()
+        self.access.set_x(x_line)
+        self.x_line = self.access.get_x()
+        self.access.set_y(y_line)
+        self.y_line = self.access.get_y()
+        self.rooms_dict = dict()
+        Map_bilder.map_builder(self)
+
+    def map_builder(self):
+        for x in range(1, self.x_line+1):
+            self.rooms_dict.update({f'{str(x)}{str(y)}': Rooms(x,y) for y in range(1, self.y_line+1)})
 
 
 
@@ -96,7 +128,9 @@ class Creature():
 class Player(Creature):
 
     def __init__(self, name):
-        self.name = name
+        self.access = Access_state()
+        self.access.set_name(name)
+        self.name = self.access.get_name()
         self.state = {'name': self.name, 'attack': 10, 'shield': 10, 'hp': 100, 'agility': 1}
         self.backpack = []
         self.opt = []
@@ -170,3 +204,5 @@ class  Treasure(Creature):
 
 #def modify(specs, modifier):
     #return {key: modifier.get(key, lambda x: x)(value) for key, value in specs.items()}
+
+#rooms_list.update({f'{chr(let)}{str(num)}': Rooms(chr(let), num) for num in range(1, y_line + 1)})
