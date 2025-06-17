@@ -1,6 +1,11 @@
 
 class UI():
-    def ask(self, question, options):
+
+    def ask(self, text):
+        answer = input(text)
+        return answer
+
+    def offer(self, question, options):
         creat_opt = '\n'.join(f'{i}: {num+1}' for num, i in enumerate(options))
         pick = input(f'{question}\n{creat_opt}\n...')
         options[pick-1]()
@@ -11,11 +16,12 @@ class UI():
 
 def game():
     master = UI()
+    world = Map_bilder(10, 10)
     name = master.ask('Enter your name: ')
     stranger = Player(name)
     master.say(f'Hello {stranger.name}')
     while True:
-        master.ask('What will you do?', stranger.options + stranger.curr_room.options)
+        stranger.options
 
 class Game_states():
     def __init__(self):
@@ -64,16 +70,21 @@ class Access_state():
     def get_room(self):
         return self.state.curr_room
 
+    def get_curr_room(self):
+        return self.state.curr_room
+
     def change_room(self, new_room):
         self.state.curr_room = new_room
 
 
 class Action():
     def __init__(self):
+        self.master = UI()
         self.access = Access_state()
 
-    def move(self, new_room):
-        return self.access.change_room(new_room)
+    def move(self):
+        room = self.access.get_curr_room()
+        self.master.offer('Which direction will you choose?', room.doors)
 
     def attack(self, pl_state, m_state):
         pass
@@ -110,6 +121,7 @@ class Map_bilder():
         self.y_line = self.access.get_y()
         self.rooms_dict = dict()
         Map_bilder.map_builder(self)
+        self.access.change_room('11')
 
     def map_builder(self):
         for x in range(1, self.x_line+1):
@@ -129,11 +141,12 @@ class Player(Creature):
 
     def __init__(self, name):
         self.access = Access_state()
+        self.action = Action()
         self.access.set_name(name)
         self.name = self.access.get_name()
         self.state = {'name': self.name, 'attack': 10, 'shield': 10, 'hp': 100, 'agility': 1}
         self.backpack = []
-        self.opt = []
+        self.opt = [self.action.move()]
 
     def state(self, impact):
         self.state += impact
@@ -206,3 +219,5 @@ class  Treasure(Creature):
     #return {key: modifier.get(key, lambda x: x)(value) for key, value in specs.items()}
 
 #rooms_list.update({f'{chr(let)}{str(num)}': Rooms(chr(let), num) for num in range(1, y_line + 1)})
+
+game()
