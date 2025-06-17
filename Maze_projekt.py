@@ -18,8 +18,8 @@ def game():
         master.ask('What will you do?', stranger.options + stranger.curr_room.options)
 
 class Game_states():
-    def __init__(self, name):
-        self.name = name
+    def __init__(self):
+        self.name = None
         self.pl_state = dict()
         self.backpack = []
         self.curr_room = None
@@ -32,6 +32,9 @@ class Access_state():
     def get_name(self):
         return self.state.name
 
+    def set_name(self, name):
+        self.state.name = name
+
     def get_plst(self):
         return self.state.pl_state
 
@@ -41,11 +44,8 @@ class Access_state():
     def get_bp(self):
         return self.state.backpack
 
-    def add_bp(self, itm):
-        self.state.backpack = self.state.backpack + itm
-
-    def sub_bp(self, itm):
-        self.state.backpack = self.state.backpack - itm
+    def change_bp(self, new_bp):
+        self.state.backpack = new_bp
 
     def get_room(self):
         return self.state.curr_room
