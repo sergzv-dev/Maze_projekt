@@ -61,7 +61,7 @@ class MoveAction(Action):
     def execute(self, game_state):
         self.state = game_state
 
-    def __repr__(self):
+    def __repr__(self):  #хочу сделать repr чтоб печаталось "выбрать путь" но нет доступа к UI на данном этапе
         pass
 
 
