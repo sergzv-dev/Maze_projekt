@@ -32,7 +32,6 @@ class Game_states():
         self.x_size = 0
         self.y_size = 0
 
-
 class Access_state():
     def __init__(self):
         self.state = Game_states()
@@ -93,23 +92,22 @@ class Action():
 
 import itertools as it
 
-class Rooms():
+class Room():
     def __init__(self, x, y):
         self.access = Access_state()
         self.name = str(x) + str(y)
         self.x = x
         self.y = y
         self.opt = []
-        self.doors = []
-        Rooms.doors(self)
 
     def options(self):
         return self.opt
 
+    @property
     def doors(self):
         x_option = filter(lambda num: 0 < num <= self.access.get_x(), (self.x + 1, self.x - 1,))
         y_option = filter(lambda num: 0 < num <= self.access.get_y(), (self.y + 1, self.y - 1,))
-        self.doors = [f'{room[0]}{room[1]}' for room in it.product(x_option, y_option)]
+        return [f'{room[0]}{room[1]}' for room in it.product(x_option, y_option)]
 
 
 class Map_bilder():
