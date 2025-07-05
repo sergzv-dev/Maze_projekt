@@ -121,13 +121,4 @@ def name_convert(x, y = None):
     return res
 
 
-
-'''def map_builder(x_line, y_line):
-    rooms_dict = {'map_size': (x_line, y_line)}  #что думаешь если зашить map_size в rooms_dict как тех.инфу чтоб достать из GameState
-    name = lambda x, y: f'{str(x)}{str(y)}'
-    for x in range(x_line):
-        rooms_dict.update({name(x,y): Room(name(x,y)) for y in range(y_line)})
-    return rooms_dict'''
-
-
 game()
