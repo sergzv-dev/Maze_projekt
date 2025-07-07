@@ -5,8 +5,8 @@ class UI():
 
     def choose(self, options):
         create_opt = '\n'.join(f'{i}: {num + 1}' for num, i in enumerate(options))
-        answer = input(f'{create_opt}')
-        return options[answer]
+        answer = input(f'{create_opt}\n...')
+        return options[int(answer)-1]
 
     def say(self, text):
         print(text)
@@ -14,10 +14,10 @@ class UI():
 def game():
     master = UI()
     name = master.ask("What is your name? ")
-    stranger = Player(name)
-    world = World()
+    player = Player(name)
+    world = World(10, 10)
     curr_room = world.rooms_dict[name_convert('A1')]
-    game_state = GameState(master, world, stranger, curr_room)
+    game_state = GameState(master, world, player, curr_room)
     while True:
         actions = game_state.possible_actions()
         action = master.choose(actions)
@@ -38,7 +38,6 @@ class Room():
     def __init__(self, name):
         self.name = name
         self.actions = []
-        MoveAction(self)
 
     def __repr__(self):
         return name_convert(self.name)
@@ -49,20 +48,16 @@ class Action():
         pass
 
 class MoveAction(Action):
-    def __init__(self, room): #как при создании класса сделать возможным обращаться к UI или лучше к
-                                #GameState ведь это доступно становится только после execute
-        self.room = room
-        self.doors = []
-        self.room.append(self)
-
-    def move(self):
-        self.state.curr_room = self.room
+    def __init__(self, target_room):
+        self.target_room = target_room
 
     def execute(self, game_state):
         self.state = game_state
+        self.state.curr_room = self.target_room
+        return self.state
 
-    def __repr__(self):  #хочу сделать repr чтоб печаталось "выбрать путь" но нет доступа к UI на данном этапе
-        return f'Go to the room {self.room}'
+    def __repr__(self):
+        return f'Go to the room {self.target_room}'
 
 
 class OpenBackPack:
@@ -94,40 +89,44 @@ class Creature():
 class Player(Creature):
     def __init__(self, name):
         super().__init__(name)
-        self.actions = [OpenBackPack]
+        self.actions = []
 
 class Monster(Creature):
     pass
 
 class World():
-    def __innit__(self, x_line, y_line):
+    def __init__(self, x_line, y_line, cls_room = Room, action = MoveAction):
         self.size = (x_line, y_line)
         self.x_line = x_line
         self.y_line = y_line
         self.rooms_dict = dict()
-        self.map_builder()
+        self.cls_room = cls_room
+        self.action = action
+        self.map_builder(self.cls_room)
+        self.doors_builder(self.rooms_dict, self.action)
 
-    def map_builder(self, func):
-        for x in range(self.x_line):
-            self.rooms_dict.update({(x, y): func((x, y)) for y in range(self.y_line)})
+    def map_builder(self, cls_room):
+        for x in range(1, self.x_line+1):
+            self.rooms_dict.update({(x, y): cls_room((x, y)) for y in range(1, self.y_line+1)})
+
+    @staticmethod
+    def doors_builder(rooms_dict, action):
+        for x, y in rooms_dict:
+            doors = [(x+1, y), (x-1, y), (x, y+1), (x, y-1)]
+            for num in doors:
+                door = rooms_dict.get(num)
+                if door is not None:
+                    rooms_dict[(x, y)].actions.append(action(door))
 
 
-def name_convert(x, y = None):
+
+def name_convert(name):
     res = None
-    if isinstance(x, int):
-        res = f'{chr(x+64)}{str(y)}'
-    if isinstance(x, str):
-        res = ord(x[0])-64, int(x[1])
+    if isinstance(name, tuple):
+        res = f'{chr(name[0]+64)}{str(name[1])}'
+    if isinstance(name, str):
+        res = ord(name[0])-64, int(name[1])
     return res
-
-
-
-'''def map_builder(x_line, y_line):
-    rooms_dict = {'map_size': (x_line, y_line)}  #что думаешь если зашить map_size в rooms_dict как тех.инфу чтоб достать из GameState
-    name = lambda x, y: f'{str(x)}{str(y)}'
-    for x in range(x_line):
-        rooms_dict.update({name(x,y): Room(name(x,y)) for y in range(y_line)})
-    return rooms_dict'''
 
 
 game()
