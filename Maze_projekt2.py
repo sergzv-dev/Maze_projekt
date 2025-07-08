@@ -37,7 +37,8 @@ class GameState():
 class Room():
     def __init__(self, name):
         self.name = name
-        self.actions = []
+        self.actions = [SearchAction()]
+        self.hidden_actions = []
 
     def __repr__(self):
         return name_convert(self.name)
@@ -52,58 +53,61 @@ class MoveAction(Action):
         self.target_room = target_room
 
     def execute(self, game_state):
-        self.state = game_state
-        self.state.curr_room = self.target_room
-        return self.state
+        game_state.curr_room = self.target_room
+        return game_state
 
     def __repr__(self):
         return f'Go to the room {self.target_room}'
 
 
-class OpenBackPack:
-    def show(self):
-        return self.state.player.back_pack
-    def __repr__(self):
-        return 'Open back pack'
+class OpenBackPack(Action):
+    pass
 
-class GetItem():
-    def get_it(self):
-        self.state.player.back_pack = self.state.player.back_pack + ['heal']
-        return self.state.player.back_pack
+class GetItem(Action):
+    pass
 
 
 class SearchAction(Action):
-    pass
+    def execute(self, game_state):
+        room = game_state.curr_room
+        room.actions = room.hidden_actions + room.actions
+        room.actions.remove(self)
+        return game_state
+
+    def __repr__(self):
+        return f'Search the room'
+
 
 class FightAction(Action):
     pass
 
 
 class Creature():
-    def __init__(self, name):
+    def __init__(self, name, attack, shield, hp, agility):
         self.name = name
+        self.attack = attack
+        self.shield = shield
+        self.hp = hp
+        self.agility = agility
         self.back_pack = []
-        self.actions = []
 
 
 class Player(Creature):
-    def __init__(self, name):
-        super().__init__(name)
+    def __init__(self, name, attack = 10, shield = 20, hp = 100, agility = 5):
+        super().__init__(name, attack, shield, hp, agility)
         self.actions = []
 
 class Monster(Creature):
     pass
 
 class World():
-    def __init__(self, x_line, y_line, cls_room = Room, action = MoveAction):
+    def __init__(self, x_line, y_line):
         self.size = (x_line, y_line)
         self.x_line = x_line
         self.y_line = y_line
         self.rooms_dict = dict()
-        self.cls_room = cls_room
-        self.action = action
-        self.map_builder(self.cls_room)
-        self.doors_builder(self.rooms_dict, self.action)
+        self.map_builder(Room)
+        self.doors_builder(self.rooms_dict, MoveAction)
 
     def map_builder(self, cls_room):
         for x in range(1, self.x_line+1):
@@ -121,12 +125,11 @@ class World():
 
 
 def name_convert(name):
-    res = None
     if isinstance(name, tuple):
-        res = f'{chr(name[0]+64)}{str(name[1])}'
+        return f'{chr(name[0]+64)}{str(name[1])}'
     if isinstance(name, str):
-        res = ord(name[0])-64, int(name[1])
-    return res
+        return ord(name[0])-64, int(name[1:])
+    raise TypeError('"name" must be srt or tuple')
 
 
 game()
