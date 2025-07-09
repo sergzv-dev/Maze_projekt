@@ -1,3 +1,5 @@
+import random
+
 class UI():
     def ask(self, text):
         answer = input(text)
@@ -19,6 +21,8 @@ def game():
     curr_room = world.rooms_dict[name_convert('A1')]
     game_state = GameState(master, world, player, curr_room)
     while True:
+        print(f'player hp = {game_state.player.hp}')
+        print(f'monster {game_state.curr_room.monster}\n')
         actions = game_state.possible_actions()
         action = master.choose(actions)
         game_state = action.execute(game_state)
@@ -39,6 +43,7 @@ class Room():
         self.name = name
         self.actions = [SearchAction()]
         self.hidden_actions = []
+        self.monster = None
 
     def __repr__(self):
         return name_convert(self.name)
@@ -79,7 +84,22 @@ class SearchAction(Action):
 
 
 class FightAction(Action):
-    pass
+    def execute(self, game_state):
+        room = game_state.curr_room
+        player = game_state.player
+        monster = game_state.curr_room.monster
+        while True:
+            monster.hp -= max(1, round(player.attack - player.attack * (monster.shield/100)))
+            if monster.hp < 1:
+                game_state.curr_room.monster = None
+                room.actions.remove(self)
+                return game_state
+            player.hp -= max(1, round(monster.attack - monster.attack * (player.shield/100)))
+            if player.hp < 1:
+                raise ValueError('Game Over!!')
+
+    def __repr__(self):
+        return f'Fight to the monster!!'
 
 
 class Creature():
@@ -98,7 +118,8 @@ class Player(Creature):
         self.actions = []
 
 class Monster(Creature):
-    pass
+    def __repr__(self):
+        return f'{self.name}'
 
 class World():
     def __init__(self, x_line, y_line):
@@ -108,6 +129,7 @@ class World():
         self.rooms_dict = dict()
         self.map_builder(Room)
         self.doors_builder(self.rooms_dict, MoveAction)
+        self.add_monster(self.rooms_dict, NewMonster, Monster, FightAction)
 
     def map_builder(self, cls_room):
         for x in range(1, self.x_line+1):
@@ -122,6 +144,49 @@ class World():
                 if door is not None:
                     rooms_dict[(x, y)].actions.append(action(door))
 
+    @staticmethod
+    def add_monster(rooms_dict, new_monster, monster, fight):
+        creature = None
+        add_func = lambda spec, impact: {key: impact.get(key, lambda x: x)(value) for key, value in spec.items()}
+        for room in rooms_dict:
+            if random.randint(1, 4) == 1:
+                creature = new_monster.up_monster()
+                if random.randint(1, 2) == 1:
+                    creature = add_func(creature, new_monster.up_name())
+                    if random.randint(1, 5) == 1:
+                        creature = add_func(creature, new_monster.up_super())
+            if creature is not None:
+                rooms_dict[room].monster = monster(
+                    creature['name'], creature['attack'], creature['shield'], creature['hp'], creature['agility']
+                )
+                rooms_dict[room].hidden_actions.append(fight())
+
+
+class NewMonster():
+    @staticmethod
+    def up_monster():
+        soldier = {'name': 'soldier', 'attack': 15, 'shield': 10, 'hp': 30, 'agility': 2}
+        goblin = {'name': 'goblin', 'attack': 10, 'shield': 5, 'hp': 25, 'agility': 3}
+        mage = {'name': 'mage', 'attack': 20, 'shield': 5, 'hp': 20, 'agility': 5}
+        knight = {'name': 'knight', 'attack': 10, 'shield': 20, 'hp': 50, 'agility': 0}
+        mimic = {'name': 'mimic', 'attack': 30, 'shield': 5, 'hp': 15, 'agility': 0}
+        return random.choice((soldier, goblin, mage, knight, mimic))
+
+    @staticmethod
+    def up_name():
+        undead = {'name': lambda x: 'undead '+x, 'attack': lambda x: x-5, 'hp': lambda x: x+15}
+        beasty = {'name': lambda x: 'beasty '+x, 'attack': lambda x: x+5, 'agility': lambda x: x+5}
+        demonic = {'name': lambda x: 'demonic '+x, 'shield': lambda x: x+30, 'hp': lambda x: x-5}
+        frozen = {'name': lambda x: 'frozen '+x, 'hp': lambda x: x+30, 'agility': lambda x: 0}
+        cursed = {'name': lambda x: 'cursed '+x, 'attack': lambda x: x-5, 'hp': lambda x: x-10}
+        return random.choice((undead, beasty, demonic, frozen, cursed))
+
+    @staticmethod
+    def up_super():
+        champion = {'name': lambda x: ('champion '+x).upper(), 'shield': lambda x: x+20, 'hp': lambda x: x+20}
+        flaming = {'name': lambda x: ('flaming '+x).upper(), 'attack': lambda x: x+30}
+        furious = {'name': lambda x: ('furious '+x).upper(), 'shield': lambda x: x+30}
+        return random.choice((champion, flaming, furious))
 
 
 def name_convert(name):
