@@ -21,8 +21,9 @@ def game():
     curr_room = world.rooms_dict[name_convert('A1')]
     game_state = GameState(master, world, player, curr_room)
     while True:
-        print(f'player hp = {game_state.player.hp}')
-        print(f'monster {game_state.curr_room.monster}\n')
+        print(f'current room: {game_state.curr_room}')
+        print(f'monster: {game_state.curr_room.monster}')
+        print(f'loot: {game_state.curr_room.loot}\n')
         actions = game_state.possible_actions()
         action = master.choose(actions)
         game_state = action.execute(game_state)
@@ -44,6 +45,7 @@ class Room():
         self.actions = [SearchAction()]
         self.hidden_actions = []
         self.monster = None
+        self.loot = None
 
     def __repr__(self):
         return name_convert(self.name)
@@ -65,13 +67,6 @@ class MoveAction(Action):
         return f'Go to the room {self.target_room}'
 
 
-class OpenBackPack(Action):
-    pass
-
-class GetItem(Action):
-    pass
-
-
 class SearchAction(Action):
     def execute(self, game_state):
         room = game_state.curr_room
@@ -80,7 +75,7 @@ class SearchAction(Action):
         return game_state
 
     def __repr__(self):
-        return f'Search the room'
+        return 'Search the room'
 
 
 class FightAction(Action):
@@ -99,7 +94,99 @@ class FightAction(Action):
                 raise ValueError('Game Over!!')
 
     def __repr__(self):
-        return f'Fight to the monster!!'
+        return 'Fight to the monster!!'
+
+
+class GetItem(Action):
+    def execute(self, game_state):
+        room = game_state.curr_room
+        player = game_state.player
+        player.back_pack.append(room.loot)
+        room.loot = None
+        room.actions.remove(self)
+        return game_state
+
+    def __repr__(self):
+        return 'Get loot'
+
+
+class OpenBackPack(Action):
+    def execute(self, game_state):
+        player = game_state.player
+        ui = game_state.UI
+        action = ui.choose(player.back_pack)
+        game_state = action.execute(game_state)
+        return game_state
+
+    def __repr__(self):
+        return 'Open backpack'
+
+class CloseAction(Action):
+    def execute(self, game_state):
+        return game_state
+
+    def __repr__(self):
+        return 'Close'
+
+
+class ShowSpecs(Action):
+    def execute(self, game_state):
+        pl = game_state.player
+        specs = f'name: {pl.name}\nHP: {pl.hp}\nattack: {pl.attack}\nshield: {pl.shield}\nagility: {pl.agility}\n'
+        game_state.UI.say(specs)
+        return game_state
+
+    def __repr__(self):
+        return 'Show specs'
+
+class Treasure(Action):
+    def execute(self, game_state):
+        pass
+
+class LittleMedicine(Treasure):
+    def execute(self, game_state):
+        player = game_state.player
+        player.hp = min(100, player.hp + 10)
+        player.back_pack.remove(self)
+        return game_state
+    def __repr__(self):
+        return 'Use little medicine'
+
+class Medicine(Treasure):
+    def execute(self, game_state):
+        player = game_state.player
+        player.hp = min(100, player.hp + 15)
+        player.back_pack.remove(self)
+        return game_state
+    def __repr__(self):
+        return 'Use medicine'
+
+class LargeMedicine(Treasure):
+    def execute(self, game_state):
+        player = game_state.player
+        player.hp = min(100, player.hp + 25)
+        player.back_pack.remove(self)
+        return game_state
+    def __repr__(self):
+        return 'Use large medicine'
+
+class ImproveAttack(Treasure):
+    def execute(self, game_state):
+        player = game_state.player
+        player.attack += 5
+        player.back_pack.remove(self)
+        return game_state
+    def __repr__(self):
+        return 'add 5 points to attack'
+
+class ImproveShield(Treasure):
+    def execute(self, game_state):
+        player = game_state.player
+        player.shield += 10
+        player.back_pack.remove(self)
+        return game_state
+    def __repr__(self):
+        return 'add 10 points to shield'
 
 
 class Creature():
@@ -109,13 +196,13 @@ class Creature():
         self.shield = shield
         self.hp = hp
         self.agility = agility
-        self.back_pack = []
 
 
 class Player(Creature):
     def __init__(self, name, attack = 10, shield = 20, hp = 100, agility = 5):
         super().__init__(name, attack, shield, hp, agility)
-        self.actions = []
+        self.actions = [ShowSpecs(), OpenBackPack()]
+        self.back_pack = [CloseAction()]
 
 class Monster(Creature):
     def __repr__(self):
@@ -130,6 +217,7 @@ class World():
         self.map_builder(Room)
         self.doors_builder(self.rooms_dict, MoveAction)
         self.add_monster(self.rooms_dict, NewMonster, Monster, FightAction)
+        self.add_loot(self.rooms_dict, GetItem, LittleMedicine, Medicine, LargeMedicine, ImproveAttack, ImproveShield)
 
     def map_builder(self, cls_room):
         for x in range(1, self.x_line+1):
@@ -161,6 +249,23 @@ class World():
                 )
                 rooms_dict[room].hidden_actions.append(fight())
 
+    @staticmethod
+    def add_loot(rooms_dict, get_item, lit_med, med, large_med, imp_attack, imp_shield):
+        for room in rooms_dict:
+            if random.randint(1, 3) == 1:
+                luck = random.randint(1, 100)
+                if 1 <= luck < 35:
+                    rooms_dict[room].loot = lit_med()
+                if 35 <= luck < 55:
+                    rooms_dict[room].loot = med()
+                if 55 <= luck < 70:
+                    rooms_dict[room].loot = large_med()
+                if 70 <= luck < 85:
+                    rooms_dict[room].loot = imp_attack()
+                if 85 <= luck < 100:
+                    rooms_dict[room].loot = imp_shield()
+                rooms_dict[room].hidden_actions.append(get_item())
+
 
 class NewMonster():
     @staticmethod
@@ -188,6 +293,8 @@ class NewMonster():
         furious = {'name': lambda x: ('furious '+x).upper(), 'shield': lambda x: x+30}
         return random.choice((champion, flaming, furious))
 
+class NewTreasure():
+    pass
 
 def name_convert(name):
     if isinstance(name, tuple):
