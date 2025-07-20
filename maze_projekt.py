@@ -1,7 +1,7 @@
 '''Main game modul'''
 
 from creatures import Player
-from  room import name_convert
+from room import name_convert
 from ui_terminal import UI
 from map_bilder import World
 from game_states import GameState

@@ -23,7 +23,7 @@ class Medicine(Treasure):
         return game_state
 
     def __repr__(self):
-        return f'Use {self.name}'
+        return f'{self.name}'
 
 
 class ImproveAttack(Treasure):
@@ -34,7 +34,7 @@ class ImproveAttack(Treasure):
         return game_state
 
     def __repr__(self):
-        return 'add 5 points to attack'
+        return 'attack booster'
 
 
 class ImproveShield(Treasure):
@@ -45,4 +45,4 @@ class ImproveShield(Treasure):
         return game_state
 
     def __repr__(self):
-        return 'add 10 points to shield'
+        return 'shield booster'

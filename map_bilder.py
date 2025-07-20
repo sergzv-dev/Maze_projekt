@@ -4,6 +4,7 @@ import random
 from actions import MoveAction, FightAction, GetItem
 from treasures import Medicine, ImproveAttack, ImproveShield
 from creatures import Monster
+from loot_box import LootBox
 from  room import Room
 
 class World():
@@ -16,6 +17,7 @@ class World():
         self.doors_builder(self.rooms_dict, MoveAction)
         self.add_monster(self.rooms_dict, NewMonster, Monster, FightAction)
         self.add_loot(self.rooms_dict, GetItem, Medicine, ImproveAttack, ImproveShield)
+        self.add_box(self.rooms_dict, LootBox)
 
     def map_builder(self, cls_room):
         for x in range(1, self.x_line+1):
@@ -64,6 +66,12 @@ class World():
                     rooms_dict[room].loot = imp_shield()
                 rooms_dict[room].hidden_actions.append(get_item())
 
+    @staticmethod
+    def add_box(rooms_dict, box):
+        for room in rooms_dict:
+            if random.randint(1, 3) == 1:
+                rooms_dict[room].box = box
+                rooms_dict[room].hidden_actions.append(open_box())
 
 class NewMonster():
     @staticmethod

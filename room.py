@@ -9,6 +9,7 @@ class Room():
         self.hidden_actions = []
         self.monster = None
         self.loot = None
+        self.box = None
 
     def __repr__(self):
         return name_convert(self.name)

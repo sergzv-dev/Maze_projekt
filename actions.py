@@ -88,3 +88,6 @@ class ShowSpecs(Action):
     def __repr__(self):
         return 'Show specs'
 
+class OpenBox(Action):
+    def execute(self, game_state):
+        pass
