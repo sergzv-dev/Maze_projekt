@@ -17,7 +17,8 @@ def game():
     while True:
         print(f'current room: {game_state.curr_room}')
         print(f'monster: {game_state.curr_room.monster}')
-        print(f'loot: {game_state.curr_room.loot}\n')
+        print(f'loot: {game_state.curr_room.loot}')
+        print(f'box: {game_state.curr_room.box}\n')
         actions = game_state.possible_actions()
         action = master.choose(actions)
         game_state = action.execute(game_state)

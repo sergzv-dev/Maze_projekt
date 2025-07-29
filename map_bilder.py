@@ -1,7 +1,7 @@
 ''' Module generate and fills the map in the beginning'''
 
 import random
-from actions import MoveAction, FightAction, GetItem
+from actions import MoveAction, FightAction, OpenBox
 from treasures import Medicine, ImproveAttack, ImproveShield
 from creatures import Monster
 from loot_box import LootBox
@@ -16,8 +16,7 @@ class World():
         self.map_builder(Room)
         self.doors_builder(self.rooms_dict, MoveAction)
         self.add_monster(self.rooms_dict, NewMonster, Monster, FightAction)
-        self.add_loot(self.rooms_dict, GetItem, Medicine, ImproveAttack, ImproveShield)
-        self.add_box(self.rooms_dict, LootBox)
+        self.add_loot(self.rooms_dict, LootBox, OpenBox, Medicine, ImproveAttack, ImproveShield)
 
     def map_builder(self, cls_room):
         for x in range(1, self.x_line+1):
@@ -50,27 +49,20 @@ class World():
                 rooms_dict[room].hidden_actions.append(fight())
 
     @staticmethod
-    def add_loot(rooms_dict, get_item, med, imp_attack, imp_shield):
+    def add_loot(rooms_dict, box, open_box, med, imp_attack, imp_shield):
         for room in rooms_dict:
             if random.randint(1, 3) == 1:
                 luck = random.randint(1, 100)
                 if 1 <= luck < 35:
-                    rooms_dict[room].loot = med(10)
+                    rooms_dict[room].box = box(med(10))
                 if 35 <= luck < 55:
-                    rooms_dict[room].loot = med(15)
+                    rooms_dict[room].box = box(med(15))
                 if 55 <= luck < 70:
-                    rooms_dict[room].loot = med(25)
+                    rooms_dict[room].box = box(med(25))
                 if 70 <= luck < 85:
-                    rooms_dict[room].loot = imp_attack()
-                if 85 <= luck < 100:
-                    rooms_dict[room].loot = imp_shield()
-                rooms_dict[room].hidden_actions.append(get_item())
-
-    @staticmethod
-    def add_box(rooms_dict, box):
-        for room in rooms_dict:
-            if random.randint(1, 3) == 1:
-                rooms_dict[room].box = box
+                    rooms_dict[room].box = box(imp_attack())
+                if 85 <= luck <= 100:
+                    rooms_dict[room].box = box(imp_shield())
                 rooms_dict[room].hidden_actions.append(open_box())
 
 class NewMonster():

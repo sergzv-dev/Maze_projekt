@@ -9,5 +9,3 @@ class GameState():
 
     def possible_actions(self):
         return self.player.actions + self.curr_room.actions
-
-

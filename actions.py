@@ -90,4 +90,12 @@ class ShowSpecs(Action):
 
 class OpenBox(Action):
     def execute(self, game_state):
-        pass
+        room = game_state.curr_room
+        room.loot = room.box.loot
+        room.actions.append(GetItem())
+        room.box = None
+        room.actions.remove(self)
+        return game_state
+
+    def __repr__(self):
+        return 'Open the box'
