@@ -99,3 +99,8 @@ class OpenBox(Action):
 
     def __repr__(self):
         return 'Open the box'
+
+
+class FinalDoor(Action):
+    def execute(self, game_state):
+        pass
