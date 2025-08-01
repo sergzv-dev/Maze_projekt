@@ -6,6 +6,7 @@ from treasures import Medicine, ImproveAttack, ImproveShield
 from creatures import Monster
 from loot_box import LootBox
 from  room import Room
+from doors import EndDoorAction,Key
 
 class World():
     def __init__(self, x_line, y_line):
@@ -17,6 +18,7 @@ class World():
         self.doors_builder(self.rooms_dict, MoveAction)
         self.add_monster(self.rooms_dict, NewMonster, Monster, FightAction)
         self.add_loot(self.rooms_dict, LootBox, OpenBox, Medicine, ImproveAttack, ImproveShield)
+        self.add_end_game(self.rooms_dict, EndDoorAction, Key, LootBox, OpenBox)
 
     def map_builder(self, cls_room):
         for x in range(1, self.x_line+1):
@@ -64,6 +66,18 @@ class World():
                 if 85 <= luck <= 100:
                     rooms_dict[room].box = box(imp_shield())
                 rooms_dict[room].hidden_actions.append(open_box())
+
+    @staticmethod
+    def add_end_game(rooms_dict, door, key, box, open_box):
+        end_room = random.choice(list(rooms_dict.values()))
+        end_room.hidden_actions.append(door())
+        key_room = random.choice(list(rooms_dict.values()))
+
+        if key_room.box is not None:
+            key_room.box = box(key(1))
+        else:
+            key_room.box = box(key(1))
+            key_room.hidden_actions.append(open_box())
 
 class NewMonster():
     @staticmethod

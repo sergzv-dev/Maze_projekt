@@ -1,5 +1,7 @@
 ''' Module contains actions for the game'''
 
+from game_endings import IngloriousDeath
+
 class Action():
     def execute(self, game_state):
         pass
@@ -20,6 +22,7 @@ class SearchAction(Action):
     def execute(self, game_state):
         room = game_state.curr_room
         room.actions = room.hidden_actions + room.actions
+        room.hidden_actions = []
         room.actions.remove(self)
         return game_state
 
@@ -40,7 +43,7 @@ class FightAction(Action):
                 return game_state
             player.hp -= max(1, round(monster.attack - monster.attack * (player.shield/100)))
             if player.hp < 1:
-                raise ValueError('Game Over!!')
+                return IngloriousDeath(game_state)
 
     def __repr__(self):
         return 'Fight to the monster!!'
@@ -99,8 +102,3 @@ class OpenBox(Action):
 
     def __repr__(self):
         return 'Open the box'
-
-
-class FinalDoor(Action):
-    def execute(self, game_state):
-        pass
