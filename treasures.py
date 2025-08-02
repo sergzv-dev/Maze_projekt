@@ -7,15 +7,10 @@ class Treasure(Action):
     pass
 
 class Medicine(Treasure):
-    def __init__(self, size):
-        if size == 10:
-            self.name, self.hp = 'little medicine', 10
-        elif size == 15:
-            self.name, self.hp = 'medicine', 15
-        elif size == 25:
-            self.name, self.hp = 'large medicine', 25
-        else:
-            raise ValueError('"size" should be 10, 15 or 25')
+    def __init__(self, name, hp, rarity):
+        self.name = name
+        self.hp = hp
+        self.rarity = rarity
 
     def execute(self, game_state):
         player = game_state.player
@@ -26,8 +21,23 @@ class Medicine(Treasure):
     def __repr__(self):
         return f'{self.name}'
 
+class LittleMedicine(Medicine):
+    def __init__(self):
+        super().__init__('little medicine', 10, 5)
+
+class MediumMedicine(Medicine):
+    def __init__(self):
+        super().__init__('medicine', 15, 3)
+
+class LargeMedicine(Medicine):
+    def __init__(self):
+        super().__init__('large medicine', 25, 1)
+
 
 class ImproveAttack(Treasure):
+    def __init__(self):
+        self.rarity = 1
+
     def execute(self, game_state):
         player = game_state.player
         player.attack += 5
@@ -39,6 +49,9 @@ class ImproveAttack(Treasure):
 
 
 class ImproveShield(Treasure):
+    def __init__(self):
+        self.rarity = 1
+
     def execute(self, game_state):
         player = game_state.player
         player.shield += 10
@@ -49,6 +62,9 @@ class ImproveShield(Treasure):
         return 'shield booster'
 
 class FakePowerBook(Treasure):
+    def __init__(self):
+        self.rarity = 1
+
     def execute(self, game_state):
         player = game_state.player
         ui = game_state.UI
@@ -63,15 +79,20 @@ class FakePowerBook(Treasure):
 class VictimAmulet(Treasure):
     def __init__(self):
         self.usage_check = 0
+        self.rarity = 1
 
     def execute(self, game_state):
         player = game_state.player
         player.hp = min(100, player.hp +20)
         variation = random.choice((
-            lambda: player.attack - 1, lambda: player.shield - 5,
-            lambda: player.agility - 1
+            lambda pl: setattr(pl, 'attack', max(1, pl.attack - 1)),
+            lambda pl: setattr(pl, 'shield', max(1, pl.shield - 5)),
+            lambda pl: setattr(pl, 'agility', max(1, pl.agility - 1)),
+            lambda pl: setattr(pl, 'name', random.choice(('Dingus','Dork','Clown','Waffle')))
         ))
-        variation()
+        variation(player)
+        self.usage_check += 1
+        if self.usage_check == 5: player.back_pack.remove(self)
         return game_state
 
     def __repr__(self):

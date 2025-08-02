@@ -2,10 +2,12 @@
 
 import random
 from actions import MoveAction, FightAction, OpenBox
-from treasures import Medicine, ImproveAttack, ImproveShield
+from treasures import (LittleMedicine, MediumMedicine, LargeMedicine, ImproveAttack,
+                       ImproveShield, FakePowerBook, VictimAmulet
+                       )
 from creatures import Monster
 from loot_box import LootBox
-from  room import Room
+from room import Room
 from doors import EndDoorAction,Key
 
 class World():
@@ -14,10 +16,13 @@ class World():
         self.x_line = x_line
         self.y_line = y_line
         self.rooms_dict = dict()
+        self.treasures_list = [LittleMedicine, MediumMedicine, LargeMedicine, ImproveAttack,
+                               ImproveShield, FakePowerBook, VictimAmulet
+                               ]
         self.map_builder(Room)
         self.doors_builder(self.rooms_dict, MoveAction)
         self.add_monster(self.rooms_dict, NewMonster, Monster, FightAction)
-        self.add_loot(self.rooms_dict, LootBox, OpenBox, Medicine, ImproveAttack, ImproveShield)
+        self.add_loot(self.rooms_dict, self.treasures_list, LootBox, OpenBox)
         self.add_end_game(self.rooms_dict, EndDoorAction, Key, LootBox, OpenBox)
 
     def map_builder(self, cls_room):
@@ -37,7 +42,7 @@ class World():
     def add_monster(rooms_dict, new_monster, monster, fight):
         creature = None
         add_func = lambda spec, impact: {key: impact.get(key, lambda x: x)(value) for key, value in spec.items()}
-        for room in rooms_dict:
+        for room in list(rooms_dict.values()):
             if random.randint(1, 4) == 1:
                 creature = new_monster.up_monster()
                 if random.randint(1, 2) == 1:
@@ -45,27 +50,22 @@ class World():
                     if random.randint(1, 5) == 1:
                         creature = add_func(creature, new_monster.up_super())
             if creature is not None:
-                rooms_dict[room].monster = monster(
+                room.monster = monster(
                     creature['name'], creature['attack'], creature['shield'], creature['hp'], creature['agility']
                 )
-                rooms_dict[room].hidden_actions.append(fight())
+                room.hidden_actions.append(fight())
 
     @staticmethod
-    def add_loot(rooms_dict, box, open_box, med, imp_attack, imp_shield):
-        for room in rooms_dict:
+    def add_loot(rooms_dict, treasures_list, box, open_box):
+        for room in list(rooms_dict.values()):
             if random.randint(1, 3) == 1:
-                luck = random.randint(1, 100)
-                if 1 <= luck < 35:
-                    rooms_dict[room].box = box(med(10))
-                if 35 <= luck < 55:
-                    rooms_dict[room].box = box(med(15))
-                if 55 <= luck < 70:
-                    rooms_dict[room].box = box(med(25))
-                if 70 <= luck < 85:
-                    rooms_dict[room].box = box(imp_attack())
-                if 85 <= luck <= 100:
-                    rooms_dict[room].box = box(imp_shield())
-                rooms_dict[room].hidden_actions.append(open_box())
+                treas_choose = []
+                for treas_clss_obj in treasures_list:
+                    treas_item = treas_clss_obj()
+                    treas_choose += [treas_item] * treas_item.rarity
+                treasure = random.choice(treas_choose)
+                room.box = box(treasure)
+                room.hidden_actions.append(open_box())
 
     @staticmethod
     def add_end_game(rooms_dict, door, key, box, open_box):
