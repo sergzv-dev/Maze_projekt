@@ -74,7 +74,7 @@ class FakePowerBook(Treasure):
         return game_state
 
     def __repr__(self):
-        return 'power book'
+        return 'medicine'
 
 class VictimAmulet(Treasure):
     def __init__(self):
