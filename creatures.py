@@ -9,6 +9,7 @@ class Creature():
         self.shield = shield
         self.hp = hp
         self.agility = agility
+        self.test = None
 
 
 class Player(Creature):
