@@ -16,7 +16,6 @@ def game():
     curr_room = world.rooms_dict[name_convert('A1')]
     game_state = GameState(master, world, player, curr_room)
     while True:
-        if isinstance(game_state, EndGame): break
         print(f'current room: {game_state.curr_room}')
         print(f'monster: {game_state.curr_room.monster}')
         print(f'loot: {game_state.curr_room.loot}')
@@ -26,5 +25,6 @@ def game():
         actions = game_state.possible_actions()
         action = master.choose(actions)
         game_state = action.execute(game_state)
+        if isinstance(game_state, EndGame): break
 
 game()
