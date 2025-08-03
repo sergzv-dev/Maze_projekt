@@ -72,12 +72,9 @@ class World():
         end_room = random.choice(list(rooms_dict.values()))
         end_room.hidden_actions.append(door())
         key_room = random.choice(list(rooms_dict.values()))
-
-        if key_room.box is not None:
-            key_room.box = box(key(1))
-        else:
-            key_room.box = box(key(1))
+        if key_room.box is None:
             key_room.hidden_actions.append(open_box())
+        key_room.box = box(key(1))
 
 class NewMonster():
     @staticmethod
