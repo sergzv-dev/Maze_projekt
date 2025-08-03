@@ -1,9 +1,11 @@
 ''' Module contains actions for the game'''
 
 from game_endings import IngloriousDeath
+from game_states import GameState
+from game_endings import EndGame
 
 class Action():
-    def execute(self, game_state):
+    def execute(self, game_state) -> GameState | EndGame:
         pass
 
 class MoveAction(Action):
