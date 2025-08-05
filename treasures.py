@@ -61,6 +61,7 @@ class ImproveShield(Treasure):
     def __repr__(self):
         return 'shield booster'
 
+
 class FakePowerBook(Treasure):
     def __init__(self):
         self.rarity = 1
@@ -97,3 +98,16 @@ class VictimAmulet(Treasure):
 
     def __repr__(self):
         return 'victim amulet'
+
+
+class Key(Treasure):
+    def __init__(self, name):
+        self.name = name
+
+    def execute(self, game_state):
+        ui = game_state.UI
+        ui.say('You must find exit!')
+        return game_state
+
+    def __repr__(self):
+        return self.name

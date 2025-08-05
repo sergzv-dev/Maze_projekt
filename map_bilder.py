@@ -1,14 +1,13 @@
 ''' Module generate and fills the map in the beginning'''
 
 import random
-from actions import MoveAction, FightAction, OpenBox
+from actions import MoveAction, FightAction, OpenBox, EndDoorAction
 from treasures import (LittleMedicine, MediumMedicine, LargeMedicine, ImproveAttack,
-                       ImproveShield, FakePowerBook, VictimAmulet
+                       ImproveShield, FakePowerBook, VictimAmulet, Key
                        )
 from creatures import Monster
 from loot_box import LootBox
 from room import Room
-from doors import EndDoorAction,Key
 
 class World():
     def __init__(self, x_line, y_line):
@@ -69,12 +68,13 @@ class World():
 
     @staticmethod
     def add_end_game(rooms_dict, door, key, box, open_box):
+        end_g_key = key('Golden key')
         end_room = random.choice(list(rooms_dict.values()))
-        end_room.hidden_actions.append(door())
+        end_room.hidden_actions.append(door(end_g_key))
         key_room = random.choice(list(rooms_dict.values()))
         if key_room.box is None:
             key_room.hidden_actions.append(open_box())
-        key_room.box = box(key(1))
+        key_room.box = box(end_g_key)
 
 class NewMonster():
     @staticmethod

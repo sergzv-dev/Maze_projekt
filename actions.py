@@ -1,6 +1,6 @@
 ''' Module contains actions for the game'''
 
-from game_endings import IngloriousDeath
+from game_endings import IngloriousDeath, HappyEnd
 from game_states import GameState
 from game_endings import EndGame
 
@@ -104,3 +104,19 @@ class OpenBox(Action):
 
     def __repr__(self):
         return 'Open the box'
+
+class EndDoorAction(Action):
+    def __init__(self, key):
+        self.key = key
+
+    def execute(self, game_state):
+        player = game_state.player
+        ui = game_state.UI
+
+        if self.key in player.back_pack:
+            return HappyEnd(game_state)
+        else: ui.say('You don\'t have suitable key')
+        return game_state
+
+    def __repr__(self):
+        return 'Try to open old hidden door'
