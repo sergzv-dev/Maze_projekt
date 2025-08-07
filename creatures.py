@@ -7,7 +7,8 @@ class Creature():
         self.name = name
         self.attack = attack
         self.shield = shield
-        self.max_shield = 25
+        self.max_shield = shield
+        if isinstance(self, Player): self.max_shield = 25
         self.hp = hp
         self.max_hp = 100
         self.agility = agility

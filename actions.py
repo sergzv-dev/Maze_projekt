@@ -38,12 +38,12 @@ class FightAction(Action):
         player = game_state.player
         monster = game_state.curr_room.monster
         while True:
-            monster.hp -= max(1, round(player.attack - player.attack * (monster.shield/100)))
+            monster.get_damage(round(player.attack - player.attack * (monster.shield/100)))
             if monster.hp < 1:
                 game_state.curr_room.monster = None
                 room.actions.remove(self)
                 return game_state
-            player.hp -= max(1, round(monster.attack - monster.attack * (player.shield/100)))
+            player.get_damage(round(monster.attack - monster.attack * (player.shield/100)))
             if player.hp < 1:
                 return IngloriousDeath(game_state)
 

@@ -14,7 +14,7 @@ class Medicine(Treasure):
 
     def execute(self, game_state):
         player = game_state.player
-        player.hp = min(100, player.hp + self.hp)
+        player.heal_hp(self.hp)
         player.back_pack.remove(self)
         return game_state
 
@@ -40,7 +40,7 @@ class ImproveAttack(Treasure):
 
     def execute(self, game_state):
         player = game_state.player
-        player.attack += 5
+        player.increase_spec('attack', 5)
         player.back_pack.remove(self)
         return game_state
 
@@ -54,7 +54,7 @@ class ImproveShield(Treasure):
 
     def execute(self, game_state):
         player = game_state.player
-        player.shield += 10
+        player.increase_spec('shield', 3)
         player.back_pack.remove(self)
         return game_state
 
@@ -69,7 +69,7 @@ class FakePowerBook(Treasure):
     def execute(self, game_state):
         player = game_state.player
         ui = game_state.UI
-        player.hp = max(1, player.hp - 50)
+        player.get_damage(50, death = False)
         player.back_pack.remove(self)
         ui.say('this thing blows up in your hand!')
         return game_state
@@ -84,11 +84,11 @@ class VictimAmulet(Treasure):
 
     def execute(self, game_state):
         player = game_state.player
-        player.hp = min(100, player.hp +20)
+        player.heal_hp(20)
         variation = random.choice((
-            lambda pl: setattr(pl, 'attack', max(1, pl.attack - 1)),
-            lambda pl: setattr(pl, 'shield', max(1, pl.shield - 5)),
-            lambda pl: setattr(pl, 'agility', max(1, pl.agility - 1)),
+            lambda pl: pl.reduce_spec('attack', 1),
+            lambda pl: pl.reduce_spec('shield', 5),
+            lambda pl: pl.reduce_spec('agility', 1),
             lambda pl: setattr(pl, 'name', random.choice(('Dingus','Dork','Clown','Waffle')))
         ))
         variation(player)
