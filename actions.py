@@ -96,6 +96,12 @@ class ShowSpecs(Action):
 class OpenBox(Action):
     def execute(self, game_state):
         room = game_state.curr_room
+        mode = getattr(room.box.loot,'mode', None)
+        if mode == 'bomb':
+            game_state = room.box.loot.execute(game_state)
+            room.box = None
+            room.actions.remove(self)
+            return game_state
         room.loot = room.box.loot
         room.actions.append(GetItem())
         room.box = None

@@ -18,7 +18,7 @@ class Creature():
 
     def get_damage(self, value, *, death = True):
         min_hp = -1
-        if not death: min_hp = 1
+        if not death and self.hp != 1: min_hp = 1
         self.hp = max(min_hp, self.hp - value)
 
     def increase_spec(self, spec, value):

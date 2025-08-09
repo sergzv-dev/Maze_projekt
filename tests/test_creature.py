@@ -20,6 +20,12 @@ def test_get_damage():
         assert player_hp == test_hp or player_hp == -1
         chek += 1
 
+    test_player = Player('test', hp=5)
+    test_player.get_damage(7, death=False)
+    assert test_player.hp == 1
+    test_player.get_damage(7, death=False)
+    assert test_player.hp == -1
+
     test_monster = Monster('monster', 15, 15, 50, 10)
     chek = 0
     while chek < 15:

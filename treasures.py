@@ -2,6 +2,7 @@
 
 from actions import Action
 import random
+from game_endings import MissingInMase
 
 class Treasure(Action):
     pass
@@ -72,7 +73,8 @@ class FakePowerBook(Treasure):
         player.get_damage(50, death = False)
         player.back_pack.remove(self)
         ui.say('this thing blows up in your hand!')
-        return game_state
+        if player.hp < 1: return MissingInMase(game_state)
+        else: return game_state
 
     def __repr__(self):
         return 'medicine'
@@ -111,3 +113,29 @@ class Key(Treasure):
 
     def __repr__(self):
         return self.name
+
+class ResilienceMutagen(Treasure):
+    def __init__(self):
+        self.rarity = 1
+
+    def execute(self, game_state):
+        player = game_state.player
+        player.increase_spec('max_hp', 10)
+        player.back_pack.remove(self)
+        return game_state
+
+    def __repr__(self):
+        return 'resilience mutagen'
+
+class Bomb(Treasure):
+    def __init__(self):
+        self.rarity = 1
+        self.mode = 'bomb'
+
+    def execute(self, game_state):
+        player = game_state.player
+        ui = game_state.UI
+        player.get_damage(50, death=False)
+        ui.say('the box suddenly explodes')
+        if player.hp < 1: return MissingInMase(game_state)
+        return game_state
