@@ -1,6 +1,6 @@
 ''' Module contains all treasures'''
 
-from actions import Action
+from actions import Action, FightAction
 import random
 from game_endings import MissingInMase
 
@@ -81,7 +81,7 @@ class FakePowerBook(Treasure):
     def __repr__(self):
         return 'medicine'
 
-class VictimAmulet(Treasure):
+class SacrificeAmulet(Treasure):
     def __init__(self):
         self.usage_check = 0
         self.rarity = 1
@@ -101,12 +101,13 @@ class VictimAmulet(Treasure):
         return game_state
 
     def __repr__(self):
-        return 'victim amulet'
+        return 'sacrifice amulet'
 
 
 class Key(Treasure):
     def __init__(self, name):
         self.name = name
+        self.mode = 'quest'
 
     def execute(self, game_state):
         ui = game_state.UI
@@ -158,9 +159,30 @@ class PhoenixAmulet(Treasure):
         player = game_state.player
         player.hp = player.max_hp // 2
         ui = game_state.UI
-        ui.say('\n\n\nA flash of light! An ancient burning bird brings you back from hell..')
+        ui.say('\n\n\nA flash of light! An ancient burning bird brings you back from the hell..')
         player.back_pack.remove(self)
         return game_state
 
     def __repr__(self):
         return 'phoenix amulet'
+
+class TrueBookOfPower(Treasure):
+    def __init__(self):
+        self.rarity = 1
+
+    def execute(self, game_state):
+        player = game_state.player
+        room = game_state.curr_room
+        ui = game_state.UI
+        sacr_treasures = list(filter(lambda item: isinstance(item, Treasure), player.back_pack))
+        sacrifice = random.choice(list(filter(lambda item: getattr(item, 'mode', None) != 'quest', sacr_treasures)))
+        player.back_pack.remove(sacrifice)
+        if room.monster:
+            room.monster = None
+            fight_action = list(filter(lambda act: isinstance(act, FightAction), room.actions))[0]
+            room.actions.remove(fight_action)
+        ui.say('all living things turned to dust')
+        return game_state
+
+    def __repr__(self):
+        return 'true book of power'

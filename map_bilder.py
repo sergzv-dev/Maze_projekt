@@ -3,8 +3,8 @@
 import random
 from actions import MoveAction, FightAction, OpenBox, EndDoorAction
 from treasures import (LittleMedicine, MediumMedicine, LargeMedicine, ImproveAttack,
-                       ImproveShield, FakePowerBook, VictimAmulet, Key, ResilienceMutagen, Bomb,
-                       PhoenixAmulet
+                       ImproveShield, FakePowerBook, SacrificeAmulet, Key, ResilienceMutagen, Bomb,
+                       PhoenixAmulet, TrueBookOfPower
                        )
 from creatures import Monster
 from loot_box import LootBox
@@ -17,8 +17,8 @@ class World():
         self.y_line = y_line
         self.rooms_dict = dict()
         self.treasures_list = [LittleMedicine, MediumMedicine, LargeMedicine, ImproveAttack,
-                               ImproveShield, FakePowerBook, VictimAmulet, ResilienceMutagen, Bomb,
-                               PhoenixAmulet
+                               ImproveShield, FakePowerBook, SacrificeAmulet, ResilienceMutagen, Bomb,
+                               PhoenixAmulet, TrueBookOfPower
                                ]
         self.map_builder(Room)
         self.doors_builder(self.rooms_dict, MoveAction)
@@ -59,7 +59,7 @@ class World():
     @staticmethod
     def add_loot(rooms_dict, treasures_list, box, open_box):
         for room in list(rooms_dict.values()):
-            if random.randint(1, 2) == 1:
+            if random.randint(1, 3) == 1:
                 treas_choose = []
                 for treas_clss_obj in treasures_list:
                     treas_item = treas_clss_obj()
