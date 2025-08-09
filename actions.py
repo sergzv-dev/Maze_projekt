@@ -45,7 +45,8 @@ class FightAction(Action):
                 return game_state
             player.get_damage(round(monster.attack - monster.attack * (player.shield/100)))
             if player.hp < 1:
-                return IngloriousDeath(game_state)
+                death = IngloriousDeath(game_state)
+                return death.last_chance()
 
     def __repr__(self):
         return 'Fight to the monster!!'

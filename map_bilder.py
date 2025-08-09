@@ -3,7 +3,8 @@
 import random
 from actions import MoveAction, FightAction, OpenBox, EndDoorAction
 from treasures import (LittleMedicine, MediumMedicine, LargeMedicine, ImproveAttack,
-                       ImproveShield, FakePowerBook, VictimAmulet, Key, ResilienceMutagen, Bomb
+                       ImproveShield, FakePowerBook, VictimAmulet, Key, ResilienceMutagen, Bomb,
+                       PhoenixAmulet
                        )
 from creatures import Monster
 from loot_box import LootBox
@@ -16,7 +17,8 @@ class World():
         self.y_line = y_line
         self.rooms_dict = dict()
         self.treasures_list = [LittleMedicine, MediumMedicine, LargeMedicine, ImproveAttack,
-                               ImproveShield, FakePowerBook, VictimAmulet, ResilienceMutagen, Bomb
+                               ImproveShield, FakePowerBook, VictimAmulet, ResilienceMutagen, Bomb,
+                               PhoenixAmulet
                                ]
         self.map_builder(Room)
         self.doors_builder(self.rooms_dict, MoveAction)

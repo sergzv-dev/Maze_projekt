@@ -73,8 +73,10 @@ class FakePowerBook(Treasure):
         player.get_damage(50, death = False)
         player.back_pack.remove(self)
         ui.say('this thing blows up in your hand!')
-        if player.hp < 1: return MissingInMase(game_state)
-        else: return game_state
+        if player.hp < 1:
+            death = MissingInMase(game_state)
+            return death.last_chance()
+        return game_state
 
     def __repr__(self):
         return 'medicine'
@@ -137,5 +139,28 @@ class Bomb(Treasure):
         ui = game_state.UI
         player.get_damage(50, death=False)
         ui.say('the box suddenly explodes')
-        if player.hp < 1: return MissingInMase(game_state)
+        if player.hp < 1:
+            death = MissingInMase(game_state)
+            return death.last_chance()
         return game_state
+
+class PhoenixAmulet(Treasure):
+    def __init__(self):
+        self.rarity = 1
+        self.mode = 'raise'
+
+    def execute(self, game_state):
+        ui = game_state.UI
+        ui.say('looks like an ancient amulet')
+        return game_state
+
+    def last_chance(self, game_state):
+        player = game_state.player
+        player.hp = player.max_hp // 2
+        ui = game_state.UI
+        ui.say('\n\n\nA flash of light! An ancient burning bird brings you back from hell..')
+        player.back_pack.remove(self)
+        return game_state
+
+    def __repr__(self):
+        return 'phoenix amulet'
