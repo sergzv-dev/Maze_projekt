@@ -16,11 +16,11 @@ def game():
     curr_room = world.rooms_dict[name_convert('A1')]
     game_state = GameState(master, world, player, curr_room)
     while True:
-        print(f'current room: {game_state.curr_room}')
-        print(f'monster: {game_state.curr_room.monster}')
-        print(f'loot: {game_state.curr_room.loot}')
-        print(f'hidden actions: {game_state.curr_room.hidden_actions}')
-        print(f'box: {game_state.curr_room.box}\n')
+        # print(f'current room: {game_state.curr_room}')
+        # print(f'monster: {game_state.curr_room.monster}')
+        # print(f'loot: {game_state.curr_room.loot}')
+        # print(f'hidden actions: {game_state.curr_room.hidden_actions}')
+        # print(f'box: {game_state.curr_room.box}\n')
 
         actions = game_state.possible_actions()
         action = master.choose(actions)

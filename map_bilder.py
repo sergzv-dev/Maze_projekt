@@ -44,7 +44,7 @@ class World():
         creature = None
         add_func = lambda spec, impact: {key: impact.get(key, lambda x: x)(value) for key, value in spec.items()}
         for room in list(rooms_dict.values()):
-            if random.randint(1, 4) == 1:
+            if random.randint(1, 5) == 1:
                 creature = new_monster.up_monster()
                 if random.randint(1, 2) == 1:
                     creature = add_func(creature, new_monster.up_name())
