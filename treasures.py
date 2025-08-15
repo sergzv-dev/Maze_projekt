@@ -1,6 +1,6 @@
 ''' Module contains all treasures'''
 
-from actions import Action, FightAction
+from actions import Action
 import random
 from game_endings import MissingInMase
 
@@ -174,13 +174,10 @@ class TrueBookOfPower(Treasure):
         player = game_state.player
         room = game_state.curr_room
         ui = game_state.UI
-        sacr_treasures = list(filter(lambda item: isinstance(item, Treasure), player.back_pack))
-        sacrifice = random.choice(list(filter(lambda item: getattr(item, 'mode', None) != 'quest', sacr_treasures)))
+        sacrifice = random.choice(list(filter(lambda item: getattr(item, 'mode', None) != 'quest', player.back_pack)))
         player.back_pack.remove(sacrifice)
         if room.monster:
             room.monster = None
-            fight_action = list(filter(lambda act: isinstance(act, FightAction), room.actions))[0]
-            room.actions.remove(fight_action)
         ui.say('all living things turned to dust')
         return game_state
 

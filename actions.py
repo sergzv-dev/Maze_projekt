@@ -23,9 +23,7 @@ class MoveAction(Action):
 class SearchAction(Action):
     def execute(self, game_state):
         room = game_state.curr_room
-        room.actions = room.hidden_actions + room.actions
-        room.hidden_actions = []
-        room.actions.remove(self)
+        room.room_searched = True
         return game_state
 
     def __repr__(self):
@@ -34,14 +32,12 @@ class SearchAction(Action):
 
 class FightAction(Action):
     def execute(self, game_state):
-        room = game_state.curr_room
         player = game_state.player
         monster = game_state.curr_room.monster
         while True:
             monster.get_damage(round(player.attack - player.attack * (monster.shield/100)))
             if monster.hp < 1:
                 game_state.curr_room.monster = None
-                room.actions.remove(self)
                 return game_state
             player.get_damage(round(monster.attack - monster.attack * (player.shield/100)))
             if player.hp < 1:
@@ -58,7 +54,6 @@ class GetItem(Action):
         player = game_state.player
         player.back_pack.append(room.loot)
         room.loot = None
-        room.actions.remove(self)
         return game_state
 
     def __repr__(self):
@@ -68,9 +63,7 @@ class GetItem(Action):
 class OpenBackPack(Action):
     def execute(self, game_state):
         player = game_state.player
-        ui = game_state.UI
-        action = ui.choose(player.back_pack)
-        game_state = action.execute(game_state)
+        player.open_bp = True
         return game_state
 
     def __repr__(self):
@@ -78,6 +71,8 @@ class OpenBackPack(Action):
 
 class CloseAction(Action):
     def execute(self, game_state):
+        player = game_state.player
+        player.open_bp = False
         return game_state
 
     def __repr__(self):
@@ -101,12 +96,9 @@ class OpenBox(Action):
         if mode == 'bomb':
             game_state = room.box.loot.execute(game_state)
             room.box = None
-            room.actions.remove(self)
             return game_state
         room.loot = room.box.loot
-        room.actions.append(GetItem())
         room.box = None
-        room.actions.remove(self)
         return game_state
 
     def __repr__(self):
@@ -127,3 +119,30 @@ class EndDoorAction(Action):
 
     def __repr__(self):
         return 'Try to open old hidden door'
+
+class ActionProvider():
+    def __init__(self, game_state):
+        self.state = game_state
+        self.player = game_state.player
+
+    @property
+    def provide_action(self):
+        player_act = [ShowSpecs(), OpenBackPack()]
+        bp_actions = [CloseAction()]
+        if self.player.open_bp is True:
+            return bp_actions + self.player.back_pack
+        return player_act + self.room_act_gen()
+
+    def room_act_gen(self):
+        room = self.state.curr_room
+        room_act = room.actions
+        room_doors = room.doors
+        if not room.room_searched:
+            return [SearchAction()] + room_doors
+        if room.monster:
+            return [FightAction()] + room_doors
+        if room.box:
+            return [OpenBox()] + room_doors + room_act
+        if room.loot:
+            return [GetItem()] + room_doors + room_act
+        return room_doors + room_act
