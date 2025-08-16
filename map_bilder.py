@@ -41,6 +41,7 @@ class World():
         add_func = lambda spec, impact: {key: impact.get(key, lambda x: x)(value) for key, value in spec.items()}
         for room in list(self.rooms_dict.values()):
             creature = None
+            loot = None
             if random.randint(1, 4) == 1:
                 creature = NewMonster.up_monster()
                 if random.randint(1, 2) == 1:
@@ -48,21 +49,26 @@ class World():
                     if random.randint(1, 5) == 1:
                         creature = add_func(creature, NewMonster.up_super())
             if creature is not None:
+                if random.randint(1, 3) == 1:
+                    loot = self.give_treasure(self.treasures_list)
                 room.monster = Monster(
                     creature['name'], creature['attack'], creature['shield'], creature['hp'],
-                    creature['agility']
+                    creature['agility'], room, loot
                 )
 
     def add_loot(self):
         for room in list(self.rooms_dict.values()):
             if random.randint(1, 3) == 1:
-                treas_choose = []
-                for treas_clss_obj in self.treasures_list:
-                    treas_item = treas_clss_obj()
-                    treas_choose += [treas_item] * treas_item.rarity
-                treasure = random.choice(treas_choose)
-                room.box = LootBox(treasure)
+                room.box = LootBox(self.give_treasure(self.treasures_list))
 
+
+    @staticmethod
+    def give_treasure(treasures_list):
+        treas_choose = []
+        for treas_clss_obj in treasures_list:
+            treas_item = treas_clss_obj()
+            treas_choose += [treas_item] * treas_item.rarity
+        return random.choice(treas_choose)
 
 class NewMonster():
     @staticmethod

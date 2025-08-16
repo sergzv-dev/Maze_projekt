@@ -33,12 +33,13 @@ class SearchAction(Action):
 class FightAction(Action):
     def execute(self, game_state):
         player = game_state.player
-        monster = game_state.curr_room.monster
         while True:
-            monster.get_damage(round(player.attack - player.attack * (monster.shield/100)))
-            if monster.hp < 1:
-                game_state.curr_room.monster = None
+            monster = game_state.curr_room.monster
+            if monster is None:
                 return game_state
+            monster.get_damage(round(player.attack - player.attack * (monster.shield/100)))
+
+
             player.get_damage(round(monster.attack - monster.attack * (player.shield/100)))
             if player.hp < 1:
                 death = IngloriousDeath(game_state)
