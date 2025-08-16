@@ -49,7 +49,9 @@ class Monster(Creature):
         self.death_chek()
 
     def death_chek(self):
-        if self.hp < 1: self.room.monster = None
+        if self.hp < 1:
+            self.room.loot += self.back_pack
+            self.room.monster = None
 
     def __repr__(self):
         return f'{self.name}'

@@ -1,7 +1,6 @@
 ''' Module generate and fills the map in the beginning'''
 
 import random
-from actions import EndDoorAction
 from treasures import (LittleMedicine, MediumMedicine, LargeMedicine, ImproveAttack,
                        ImproveShield, FakePowerBook, SacrificeAmulet, Key, ResilienceMutagen, Bomb,
                        PhoenixAmulet, TrueBookOfPower
@@ -71,6 +70,17 @@ class World():
         return random.choice(treas_choose)
 
 class NewMonster():
+    def give_monster(self, room, loot = None):
+        add_func = lambda spec, impact: {key: impact.get(key, lambda x: x)(value) for key, value in spec.items()}
+        creature = self.up_monster()
+        if random.randint(1, 2) == 1:
+            creature = add_func(creature, self.up_name())
+            if random.randint(1, 5) == 1:
+                creature = add_func(creature, self.up_super())
+        return Monster(creature['name'], creature['attack'], creature['shield'], creature['hp'],
+                       creature['agility'], room, loot
+                       )
+
     @staticmethod
     def up_monster():
         soldier = {'name': 'soldier', 'attack': 15, 'shield': 10, 'hp': 30, 'agility': 2}

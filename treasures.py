@@ -117,6 +117,20 @@ class Key(Treasure):
     def __repr__(self):
         return self.name
 
+class ImmortalAmulet(Treasure):
+    def __init__(self):
+        self.name = 'immortal amulet'
+        self.mode = 'quest'
+
+    def execute(self, game_state):
+        ui = game_state.UI
+        ui.say('You must find altar for sacrifice!')
+        return game_state
+
+    def __repr__(self):
+        return self.name
+
+
 class ResilienceMutagen(Treasure):
     def __init__(self):
         self.rarity = 1

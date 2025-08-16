@@ -121,6 +121,29 @@ class EndDoorAction(Action):
     def __repr__(self):
         return 'Try to open old hidden door'
 
+class ImmortalAltarAction(Action):
+    def __init__(self, amulet):
+        self.amulet = amulet
+
+    def execute(self, game_state):
+        player = game_state.player
+        ui = game_state.UI
+
+        if self.amulet in player.back_pack:
+            player.max_hp += 10
+            player.hp = player.max_hp
+            player.attack += 15
+            player.shield += 10
+            player.agility += 10
+            ui.say('The power of sanctions gods bless your soul')
+            player.back_pack.remove(self.amulet)
+        else: ui.say('find amulet for sacrifice')
+        return game_state
+
+    def __repr__(self):
+        return 'make a sacrifice'
+
+
 class ActionProvider():
     def __init__(self):
         self.state = None
