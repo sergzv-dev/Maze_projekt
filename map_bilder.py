@@ -50,7 +50,7 @@ class World():
                         creature = add_func(creature, NewMonster.up_super())
             if creature is not None:
                 room.monster = Monster(
-                    creature['name'], creature['attack'], creature['shield'], creature['hp'], creature['agility']
+                    creature['name'], creature['attack'], creature['shield'], creature['hp'], creature['agility'], room
                 )
 
     def add_loot(self):

@@ -18,6 +18,7 @@ class Creature():
         min_hp = -1
         if not death and self.hp != 1: min_hp = 1
         self.hp = max(min_hp, self.hp - value)
+        self.death_chek()
 
     def increase_spec(self, spec, value):
         max_val = float('inf')
@@ -29,12 +30,23 @@ class Creature():
         min_val = 1
         setattr(self, spec, max(min_val, getattr(self, spec) - value))
 
+    def death_chek(self):
+        pass
+
 class Player(Creature):
     def __init__(self, name, attack = 10, shield = 20, hp = 100, agility = 5):
         super().__init__(name, attack, shield, hp, agility)
         self.back_pack = []
         self.open_bp = False
 
+
 class Monster(Creature):
+    def __init__(self, name, attack, shield, hp, agility, room):
+        super().__init__(name, attack, shield, hp, agility)
+        self.room = room
+
+    def death_chek(self):
+        if self.hp < 1: self.room.monster = None
+
     def __repr__(self):
         return f'{self.name}'

@@ -19,7 +19,7 @@ def game():
     action_provider = ActionProvider(game_state)
     while True:
         # print(f'current room: {game_state.curr_room}')
-        # print(f'monster: {game_state.curr_room.monster}')
+        print(f'monster: {game_state.curr_room.monster}')
         print(f'loot: {game_state.curr_room.loot}')
         # print(f'hidden actions: {game_state.curr_room.hidden_actions}')
         print(f'box: {game_state.curr_room.box}\n')
