@@ -10,6 +10,7 @@ class Creature():
         self.hp = hp
         self.max_hp = 100
         self.agility = agility
+        self.back_pack = []
 
     def heal_hp(self, value):
         self.hp = min(self.max_hp, self.hp + value)
@@ -18,7 +19,6 @@ class Creature():
         min_hp = -1
         if not death and self.hp != 1: min_hp = 1
         self.hp = max(min_hp, self.hp - value)
-        self.death_chek()
 
     def increase_spec(self, spec, value):
         max_val = float('inf')
@@ -30,20 +30,23 @@ class Creature():
         min_val = 1
         setattr(self, spec, max(min_val, getattr(self, spec) - value))
 
-    def death_chek(self):
-        pass
 
 class Player(Creature):
     def __init__(self, name, attack = 10, shield = 20, hp = 100, agility = 5):
         super().__init__(name, attack, shield, hp, agility)
-        self.back_pack = []
         self.open_bp = False
 
 
 class Monster(Creature):
-    def __init__(self, name, attack, shield, hp, agility, room):
+    def __init__(self, name, attack, shield, hp, agility, room, loot = None):
         super().__init__(name, attack, shield, hp, agility)
         self.room = room
+        if loot is not None:
+            self.back_pack.append(loot)
+
+    def get_damage(self, value, *, death = True):
+        super().get_damage(value)
+        self.death_chek()
 
     def death_chek(self):
         if self.hp < 1: self.room.monster = None
