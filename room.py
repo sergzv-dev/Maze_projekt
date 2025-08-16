@@ -6,7 +6,7 @@ class Room():
         self.actions = []
         self.doors = []
         self.monster = None
-        self.loot = None
+        self.loot = []
         self.box = None
         self.room_searched = False
 

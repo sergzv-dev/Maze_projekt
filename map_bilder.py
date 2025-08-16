@@ -24,7 +24,6 @@ class World():
         self.doors_builder()
         self.add_monster()
         self.add_loot()
-        self.add_end_game()
 
     def map_builder(self):
         for x in range(1, self.x_line+1):
@@ -50,7 +49,8 @@ class World():
                         creature = add_func(creature, NewMonster.up_super())
             if creature is not None:
                 room.monster = Monster(
-                    creature['name'], creature['attack'], creature['shield'], creature['hp'], creature['agility']
+                    creature['name'], creature['attack'], creature['shield'], creature['hp'],
+                    creature['agility']
                 )
 
     def add_loot(self):
@@ -63,12 +63,6 @@ class World():
                 treasure = random.choice(treas_choose)
                 room.box = LootBox(treasure)
 
-    def add_end_game(self):
-        end_g_key = Key('Golden key')
-        end_room = random.choice(list(self.rooms_dict.values()))
-        end_room.actions.append(EndDoorAction(end_g_key))
-        key_room = random.choice(list(self.rooms_dict.values()))
-        key_room.box = LootBox(end_g_key)
 
 class NewMonster():
     @staticmethod

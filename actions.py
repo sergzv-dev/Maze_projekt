@@ -52,8 +52,8 @@ class GetItem(Action):
     def execute(self, game_state):
         room = game_state.curr_room
         player = game_state.player
-        player.back_pack.append(room.loot)
-        room.loot = None
+        player.back_pack += room.loot
+        room.loot = []
         return game_state
 
     def __repr__(self):
@@ -97,7 +97,7 @@ class OpenBox(Action):
             game_state = room.box.loot.execute(game_state)
             room.box = None
             return game_state
-        room.loot = room.box.loot
+        room.loot += room.box.loot
         room.box = None
         return game_state
 
