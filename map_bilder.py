@@ -1,7 +1,7 @@
 ''' Module generate and fills the map in the beginning'''
 
 import random
-from actions import MoveAction, EndDoorAction
+from actions import EndDoorAction
 from treasures import (LittleMedicine, MediumMedicine, LargeMedicine, ImproveAttack,
                        ImproveShield, FakePowerBook, SacrificeAmulet, Key, ResilienceMutagen, Bomb,
                        PhoenixAmulet, TrueBookOfPower
@@ -36,7 +36,7 @@ class World():
             for num in doors:
                 door = self.rooms_dict.get(num)
                 if door is not None:
-                    self.rooms_dict[(x, y)].doors.append(MoveAction(door))
+                    self.rooms_dict[(x, y)].doors.append(door)
 
     def add_monster(self):
         add_func = lambda spec, impact: {key: impact.get(key, lambda x: x)(value) for key, value in spec.items()}

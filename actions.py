@@ -121,12 +121,13 @@ class EndDoorAction(Action):
         return 'Try to open old hidden door'
 
 class ActionProvider():
-    def __init__(self, game_state):
+    def __init__(self):
+        self.state = None
+        self.player = None
+
+    def provide_action(self, game_state):
         self.state = game_state
         self.player = game_state.player
-
-    @property
-    def provide_action(self):
         player_act = [ShowSpecs(), OpenBackPack()]
         bp_actions = [CloseAction()]
         if self.player.open_bp is True:
@@ -136,13 +137,18 @@ class ActionProvider():
     def room_act_gen(self):
         room = self.state.curr_room
         room_act = room.actions
-        room_doors = room.doors
+        room_doors = self.room_dor_gen()
         if not room.room_searched:
-            return [SearchAction()] + room_doors
-        if room.monster:
-            return [FightAction()] + room_doors
-        if room.box:
-            return [OpenBox()] + room_doors + room_act
-        if room.loot:
-            return [GetItem()] + room_doors + room_act
-        return room_doors + room_act
+            actions = [SearchAction()]
+        elif room.monster:
+            actions = [FightAction()]
+        elif room.box:
+            actions = [OpenBox()] + room_act
+        elif room.loot:
+            actions = [GetItem()] + room_act
+        else: actions = room_act
+        return actions + room_doors
+
+    def room_dor_gen(self):
+        room = self.state.curr_room
+        return [MoveAction(door) for door in room.doors]
