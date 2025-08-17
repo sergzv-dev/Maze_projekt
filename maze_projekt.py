@@ -17,7 +17,6 @@ def game():
     world = World(10, 10)
     curr_room = world.rooms_dict[name_convert('A1')]
     game_state = GameState(master, world, player, curr_room)
-    action_provider = ActionProvider()
     MainQuest(world)
     ImmortalAmuletQuest(world)
 
@@ -28,7 +27,7 @@ def game():
         # print(f'hidden actions: {game_state.curr_room.hidden_actions}')
         print(f'box: {game_state.curr_room.box}\n')
 
-        actions = action_provider.provide_action(game_state)
+        actions = ActionProvider.provide_action(game_state)
         action = master.choose(actions)
         game_state = action.execute(game_state)
         if isinstance(game_state, EndGame): break

@@ -144,23 +144,20 @@ class ImmortalAltarAction(Action):
 
 
 class ActionProvider():
-    def __init__(self):
-        self.state = None
-        self.player = None
-
-    def provide_action(self, game_state):
-        self.state = game_state
-        self.player = game_state.player
+    @staticmethod
+    def provide_action(game_state):
+        player = game_state.player
         player_act = [ShowSpecs(), OpenBackPack()]
         bp_actions = [CloseAction()]
-        if self.player.open_bp is True:
-            return bp_actions + self.player.back_pack
-        return player_act + self.room_act_gen()
+        if player.open_bp is True:
+            return bp_actions + player.back_pack
+        return player_act + ActionProvider.room_act_gen(game_state)
 
-    def room_act_gen(self):
-        room = self.state.curr_room
+    @staticmethod
+    def room_act_gen(game_state):
+        room = game_state.curr_room
         room_act = room.actions
-        room_doors = self.room_dor_gen()
+        room_doors = [MoveAction(door) for door in room.doors]
         if not room.room_searched:
             actions = [SearchAction()]
         elif room.monster:
@@ -171,7 +168,3 @@ class ActionProvider():
             actions = [GetItem()] + room_act
         else: actions = room_act
         return actions + room_doors
-
-    def room_dor_gen(self):
-        room = self.state.curr_room
-        return [MoveAction(door) for door in room.doors]
