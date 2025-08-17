@@ -37,23 +37,12 @@ class World():
                     self.rooms_dict[(x, y)].doors.append(door)
 
     def add_monster(self):
-        add_func = lambda spec, impact: {key: impact.get(key, lambda x: x)(value) for key, value in spec.items()}
         for room in list(self.rooms_dict.values()):
-            creature = None
             loot = None
             if random.randint(1, 4) == 1:
-                creature = NewMonster.up_monster()
-                if random.randint(1, 2) == 1:
-                    creature = add_func(creature, NewMonster.up_name())
-                    if random.randint(1, 5) == 1:
-                        creature = add_func(creature, NewMonster.up_super())
-            if creature is not None:
-                if random.randint(1, 3) == 1:
-                    loot = self.give_treasure(self.treasures_list)
-                room.monster = Monster(
-                    creature['name'], creature['attack'], creature['shield'], creature['hp'],
-                    creature['agility'], room, loot
-                )
+                loot = self.give_treasure(self.treasures_list)
+            room.monster = NewMonster.give_monster(room, loot)
+        
 
     def add_loot(self):
         for room in list(self.rooms_dict.values()):
@@ -70,13 +59,14 @@ class World():
         return random.choice(treas_choose)
 
 class NewMonster():
-    def give_monster(self, room, loot = None):
+    @staticmethod
+    def give_monster(room, loot = None):
         add_func = lambda spec, impact: {key: impact.get(key, lambda x: x)(value) for key, value in spec.items()}
-        creature = self.up_monster()
+        creature = NewMonster.up_monster()
         if random.randint(1, 2) == 1:
-            creature = add_func(creature, self.up_name())
+            creature = add_func(creature, NewMonster.up_name())
             if random.randint(1, 5) == 1:
-                creature = add_func(creature, self.up_super())
+                creature = add_func(creature, NewMonster.up_super())
         return Monster(creature['name'], creature['attack'], creature['shield'], creature['hp'],
                        creature['agility'], room, loot
                        )

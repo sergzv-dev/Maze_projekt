@@ -7,7 +7,7 @@ from map_bilder import World
 from game_states import GameState
 from game_endings import EndGame
 from actions import ActionProvider
-from quests import MainQuest
+from quests import MainQuest, ImmortalAmuletQuest
 
 
 def game():
@@ -19,6 +19,8 @@ def game():
     game_state = GameState(master, world, player, curr_room)
     action_provider = ActionProvider()
     MainQuest(world)
+    ImmortalAmuletQuest(world)
+
     while True:
         # print(f'current room: {game_state.curr_room}')
         print(f'monster: {game_state.curr_room.monster}')

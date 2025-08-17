@@ -2,6 +2,7 @@ from treasures import Key, ImmortalAmulet
 from actions import EndDoorAction, ImmortalAltarAction
 from loot_box import LootBox
 import random
+from map_bilder import NewMonster
 
 class MainQuest():
     def __init__(self, world):
@@ -19,4 +20,4 @@ class ImmortalAmuletQuest():
         altar_room = random.choice(list(self.rooms_dict.values()))
         altar_room.actions.append(ImmortalAltarAction(amulet))
         amulet_room = random.choice(list(self.rooms_dict.values()))
-        amulet_room.monster =
+        amulet_room.monster = NewMonster.give_monster(amulet_room, amulet)
