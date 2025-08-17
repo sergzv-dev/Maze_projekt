@@ -15,10 +15,10 @@ def game():
     name = master.ask("What is your name? ")
     player = Player(name)
     world = World(10, 10)
+    world = MainQuest.add_quest(world)
+    world = ImmortalAmuletQuest.add_quest(world)
     curr_room = world.rooms_dict[name_convert('A1')]
     game_state = GameState(master, world, player, curr_room)
-    MainQuest(world)
-    ImmortalAmuletQuest(world)
 
     while True:
         # print(f'current room: {game_state.curr_room}')
