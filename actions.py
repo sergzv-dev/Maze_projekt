@@ -37,10 +37,9 @@ class FightAction(Action):
             monster = game_state.curr_room.monster
             if monster is None:
                 return game_state
-            monster.get_damage(round(player.attack - player.attack * (monster.shield/100)))
+            monster.take_damage(player.attack)
 
-
-            player.get_damage(round(monster.attack - monster.attack * (player.shield/100)))
+            player.take_damage(monster.attack)
             if player.hp < 1:
                 death = IngloriousDeath(game_state)
                 return death.last_chance()

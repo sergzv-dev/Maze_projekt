@@ -15,10 +15,10 @@ class Creature():
     def heal_hp(self, value):
         self.hp = min(self.max_hp, self.hp + value)
 
-    def get_damage(self, value, *, death = True):
+    def take_damage(self, value, *, death = True):
         min_hp = -1
         if not death and self.hp != 1: min_hp = 1
-        self.hp = max(min_hp, self.hp - value)
+        self.hp = max(min_hp, self.hp - round(value*(1- self.shield/100)))
 
     def increase_spec(self, spec, value):
         max_val = float('inf')
@@ -45,7 +45,7 @@ class Monster(Creature):
             self.back_pack.append(loot)
 
     def get_damage(self, value, *, death = True):
-        super().get_damage(value)
+        super().take_damage(value)
         self.death_chek()
 
     def death_chek(self):

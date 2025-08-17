@@ -70,7 +70,7 @@ class FakePowerBook(Treasure):
     def execute(self, game_state):
         player = game_state.player
         ui = game_state.UI
-        player.get_damage(50, death = False)
+        player.take_damage(50, death = False)
         player.back_pack.remove(self)
         ui.say('this thing blows up in your hand!')
         if player.hp < 1:
@@ -152,7 +152,7 @@ class Bomb(Treasure):
     def execute(self, game_state):
         player = game_state.player
         ui = game_state.UI
-        player.get_damage(50, death=False)
+        player.take_damage(50, death=False)
         ui.say('the box suddenly explodes')
         if player.hp < 1:
             death = MissingInMase(game_state)
