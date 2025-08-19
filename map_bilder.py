@@ -2,7 +2,7 @@
 
 import random
 from treasures import (LittleMedicine, MediumMedicine, LargeMedicine, ImproveAttack,
-                       ImproveShield, FakePowerBook, SacrificeAmulet, Key, ResilienceMutagen, Bomb,
+                       ImproveShield, FakePowerBook, SacrificeAmulet, ResilienceMutagen, Bomb,
                        PhoenixAmulet, TrueBookOfPower
                        )
 from creatures import Monster
@@ -23,6 +23,9 @@ class World():
         self.doors_builder()
         self.add_monster()
         self.add_loot()
+        amount_of_monsters(self.rooms_dict)
+        amount_of_boxes(self.rooms_dict)
+
 
     def map_builder(self):
         for x in range(1, self.x_line+1):
@@ -39,14 +42,15 @@ class World():
     def add_monster(self):
         for room in list(self.rooms_dict.values()):
             loot = None
-            if random.randint(1, 4) == 1:
-                loot = self.give_treasure(self.treasures_list)
-            room.monster = NewMonster.give_monster(room, loot)
+            if random.randint(1, 2) == 1:
+                if random.randint(1, 3) == 1:
+                    loot = self.give_treasure(self.treasures_list)
+                room.monster = NewMonster.give_monster(room, loot)
         
 
     def add_loot(self):
         for room in list(self.rooms_dict.values()):
-            if random.randint(1, 3) == 1:
+            if random.randint(1, 2) == 1:
                 room.box = LootBox(self.give_treasure(self.treasures_list))
 
 
@@ -95,3 +99,12 @@ class NewMonster():
         flaming = {'name': lambda x: ('flaming '+x).upper(), 'attack': lambda x: x+30}
         furious = {'name': lambda x: ('furious '+x).upper(), 'shield': lambda x: x+30}
         return random.choice((champion, flaming, furious))
+
+def amount_of_monsters(rooms_dict):
+    monsters = len([1 for room in rooms_dict.values() if room.monster])
+    return print(f'amount of monsters {monsters}')
+
+def amount_of_boxes(rooms_dict):
+    boxes = len([1 for room in rooms_dict.values() if room.box])
+    return print(f'amount of boxes {boxes}')
+

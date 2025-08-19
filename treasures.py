@@ -70,12 +70,11 @@ class FakePowerBook(Treasure):
     def execute(self, game_state):
         player = game_state.player
         ui = game_state.UI
-        player.take_damage(50, death = False)
+        player.take_damage(50, game_state, death = False)
         player.back_pack.remove(self)
         ui.say('this thing blows up in your hand!')
-        if player.hp < 1:
-            death = MissingInMase(game_state)
-            return death.last_chance()
+        if player.death_marker:
+            return MissingInMase(game_state)
         return game_state
 
     def __repr__(self):
@@ -152,11 +151,10 @@ class Bomb(Treasure):
     def execute(self, game_state):
         player = game_state.player
         ui = game_state.UI
-        player.take_damage(50, death=False)
+        player.take_damage(50, game_state, death=False)
         ui.say('the box suddenly explodes')
-        if player.hp < 1:
-            death = MissingInMase(game_state)
-            return death.last_chance()
+        if player.death_marker:
+            return MissingInMase(game_state)
         return game_state
 
 class PhoenixAmulet(Treasure):
@@ -172,6 +170,7 @@ class PhoenixAmulet(Treasure):
     def last_chance(self, game_state):
         player = game_state.player
         player.hp = player.max_hp // 2
+        player.death_marker = False
         ui = game_state.UI
         ui.say('\n\n\nA flash of light! An ancient burning bird brings you back from the hell..')
         player.back_pack.remove(self)
@@ -191,7 +190,7 @@ class TrueBookOfPower(Treasure):
         sacrifice = random.choice(list(filter(lambda item: getattr(item, 'mode', None) != 'quest', player.back_pack)))
         player.back_pack.remove(sacrifice)
         if room.monster:
-            room.monster = None
+            room.monster.take_damage(9999, game_state)
         ui.say('all living things turned to dust')
         return game_state
 

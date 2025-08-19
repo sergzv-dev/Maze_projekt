@@ -3,6 +3,7 @@
 from game_endings import IngloriousDeath, HappyEnd
 from game_states import GameState
 from game_endings import EndGame
+import random
 
 class Action():
     def execute(self, game_state) -> GameState | EndGame:
@@ -33,16 +34,15 @@ class SearchAction(Action):
 class FightAction(Action):
     def execute(self, game_state):
         player = game_state.player
-        while True:
-            monster = game_state.curr_room.monster
-            if monster is None:
-                return game_state
-            monster.take_damage(player.attack)
-
-            player.take_damage(monster.attack)
-            if player.hp < 1:
-                death = IngloriousDeath(game_state)
-                return death.last_chance()
+        player.fight_marker = True
+        monster = game_state.curr_room.monster
+        monster.take_damage(player.attack, game_state)
+        if monster.death_marker:
+            return game_state
+        player.take_damage(monster.attack, game_state)
+        if player.death_marker:
+            return IngloriousDeath(game_state)
+        return game_state
 
     def __repr__(self):
         return 'Fight to the monster!!'
@@ -104,6 +104,19 @@ class OpenBox(Action):
     def __repr__(self):
         return 'Open the box'
 
+class EscapeAction(Action):
+    def execute(self, game_state):
+        player = game_state.player
+        monster = game_state.curr_room.monster
+        if random.randint(1, 2) == 1:
+            player.take_damage(monster.attack, game_state, death = False)
+        player.fight_marker = False
+        return game_state
+
+    def __repr__(self):
+        return 'Escape the fight'
+
+
 class EndDoorAction(Action):
     def __init__(self, key):
         self.key = key
@@ -149,8 +162,10 @@ class ActionProvider():
         player = game_state.player
         player_act = [ShowSpecs(), OpenBackPack()]
         bp_actions = [CloseAction()]
-        if player.open_bp is True:
+        if player.open_bp:
             return bp_actions + player.back_pack
+        if player.fight_marker:
+            return [FightAction(), EscapeAction()] + player_act
         return player_act + ActionProvider.room_act_gen(game_state)
 
     @staticmethod

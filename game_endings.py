@@ -4,15 +4,6 @@ class EndGame():
     def __init__(self, game_state):
         self.state = game_state
 
-    def last_chance(self):
-        player = self.state.player
-        last_chance_list = list(filter(lambda item: getattr(item, 'mode', None) == 'raise', player.back_pack))
-        if last_chance_list:
-            game_state = last_chance_list[0].last_chance(self.state)
-            print(f'game state: {type(game_state)}')
-            return game_state
-        return self
-
 class HappyEnd(EndGame):
     def __init__(self, game_state):
         super().__init__(game_state)
