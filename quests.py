@@ -22,5 +22,5 @@ class ImmortalAmuletQuest():
         altar_room = random.choice(list(rooms_dict.values()))
         altar_room.actions.append(ImmortalAltarAction(amulet))
         amulet_room = random.choice(list(rooms_dict.values()))
-        amulet_room.monster = world.give_monster(amulet)
+        amulet_room.monster = world.get_random_monster(amulet)
         return world

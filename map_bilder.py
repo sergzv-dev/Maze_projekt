@@ -45,18 +45,18 @@ class World():
             loot = None
             if random.randint(1, 4) == 1:
                 if random.randint(1, 3) == 1:
-                    loot = self.give_treasure(self.treasures_list)
-                room.monster = self.give_monster(loot)
+                    loot = self.get_random_treasure(self.treasures_list)
+                room.monster = self.get_random_monster(loot)
         
 
     def add_loot(self):
         for room in list(self.rooms_dict.values()):
             if random.randint(1, 3) == 1:
-                room.box = LootBox(self.give_treasure(self.treasures_list))
+                room.box = LootBox(self.get_random_treasure(self.treasures_list))
 
 
     @staticmethod
-    def give_treasure(treasures_list):
+    def get_random_treasure(treasures_list):
         treas_choose = []
         for treas_clss_obj in treasures_list:
             treas_item = treas_clss_obj()
@@ -65,7 +65,7 @@ class World():
 
 
     @staticmethod
-    def give_monster(loot = None):
+    def get_random_monster(loot = None):
         creature = random.choice([Soldier, Goblin, Mage, Knight, Mimic])
         strong = random.choice([Undead, Beastly, Demonic, Frozen, Cursed])
         super_m = random.choice([Champion, Flaming, Furious])
