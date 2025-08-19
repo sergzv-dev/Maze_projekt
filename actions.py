@@ -129,11 +129,11 @@ class ImmortalAltarAction(Action):
         ui = game_state.UI
 
         if self.amulet in player.back_pack:
-            player.max_hp += 10
+            player.increase_spec('max_hp', 10)
             player.hp = player.max_hp
-            player.attack += 15
-            player.shield += 10
-            player.agility += 10
+            player.increase_spec('attack', 15)
+            player.increase_spec('shield', 10)
+            player.increase_spec('agility', 10)
             ui.say('The power of sanctions gods bless your soul')
             player.back_pack.remove(self.amulet)
         else: ui.say('find amulet for sacrifice')
