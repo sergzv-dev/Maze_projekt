@@ -3,12 +3,13 @@
 class Room():
     def __init__(self, name):
         self.name = name
-        self.actions = []
         self.doors = []
         self.monster = None
         self.loot = []
         self.box = None
         self.room_searched = False
+        self.end_door = None
+        self.phoenix_altar = None
 
     def __repr__(self):
         return name_convert(self.name)

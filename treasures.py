@@ -55,7 +55,7 @@ class ImproveShield(Treasure):
 
     def execute(self, game_state):
         player = game_state.player
-        player.increase_spec('shield', 3)
+        player.increase_spec('shield', 5)
         player.back_pack.remove(self)
         return game_state
 

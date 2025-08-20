@@ -7,7 +7,7 @@ from treasures import (LittleMedicine, MediumMedicine, LargeMedicine, ImproveAtt
                        )
 from creatures import (Soldier, Goblin, Mage, Knight, Mimic, Undead, Beastly, Demonic, Frozen, Cursed,
                        Champion, Flaming, Furious)
-from loot_box import LootBox
+from boxes import LootBox
 from room import Room
 
 class World():

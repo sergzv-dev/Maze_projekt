@@ -97,7 +97,7 @@ class OpenBox(Action):
             game_state = room.box.loot.execute(game_state)
             room.box = None
             return game_state
-        room.loot += room.box.loot
+        room.loot.append(room.box.loot)
         room.box = None
         return game_state
 
@@ -118,14 +118,12 @@ class EscapeAction(Action):
 
 
 class EndDoorAction(Action):
-    def __init__(self, key):
-        self.key = key
-
     def execute(self, game_state):
         player = game_state.player
         ui = game_state.UI
+        room = game_state.curr_room
 
-        if self.key in player.back_pack:
+        if room.end_door.key in player.back_pack:
             return HappyEnd(game_state)
         else: ui.say('You don\'t have suitable key')
         return game_state
@@ -134,21 +132,20 @@ class EndDoorAction(Action):
         return 'Try to open old hidden door'
 
 class ImmortalAltarAction(Action):
-    def __init__(self, amulet):
-        self.amulet = amulet
-
     def execute(self, game_state):
         player = game_state.player
         ui = game_state.UI
+        room = game_state.curr_room
+        amulet = room.phoenix_altar.key
 
-        if self.amulet in player.back_pack:
+        if amulet in player.back_pack:
             player.increase_spec('max_hp', 10)
             player.hp = player.max_hp
             player.increase_spec('attack', 15)
             player.increase_spec('shield', 10)
             player.increase_spec('agility', 10)
             ui.say('The power of sanctions gods bless your soul')
-            player.back_pack.remove(self.amulet)
+            player.back_pack.remove(amulet)
         else: ui.say('find amulet for sacrifice')
         return game_state
 
@@ -170,16 +167,20 @@ class ActionProvider():
 
     @staticmethod
     def room_act_gen(game_state):
+        actions = []
         room = game_state.curr_room
-        room_act = room.actions
         room_doors = [MoveAction(door) for door in room.doors]
         if not room.room_searched:
             actions = [SearchAction()]
         elif room.monster:
             actions = [FightAction()]
-        elif room.box:
-            actions = [OpenBox()] + room_act
-        elif room.loot:
-            actions = [GetItem()] + room_act
-        else: actions = room_act
+        else:
+            if room.box:
+                actions.append(OpenBox())
+            if room.loot:
+                actions.append(GetItem())
+            if room.end_door:
+                actions.append(EndDoorAction())
+            if room.phoenix_altar:
+                actions.append(ImmortalAltarAction())
         return actions + room_doors

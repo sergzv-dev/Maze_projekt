@@ -32,7 +32,7 @@ class Creature():
         self.death_chek(game_state)
 
     def increase_spec(self, spec, value):
-        max_val = getattr(self, f'max_{spec}')
+        max_val = getattr(self, f'max_{spec}', float('inf'))
         setattr(self, spec, min(max_val, getattr(self, spec) + value))
 
     def reduce_spec(self, spec, value):
