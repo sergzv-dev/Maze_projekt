@@ -5,8 +5,8 @@ from treasures import (LittleMedicine, MediumMedicine, LargeMedicine, ImproveAtt
                        ImproveShield, FakePowerBook, SacrificeAmulet, ResilienceMutagen, Bomb,
                        PhoenixAmulet, TrueBookOfPower
                        )
-from creatures import (Soldier, Goblin, Mage, Knight, Mimic, Undead, Beastly, Demonic, Frozen, Cursed,
-                       Champion, Flaming, Furious)
+from creatures import (Soldier, Goblin, Mage, Knight, Mimic, undead, beastly, demonic, frozen, cursed,
+                       champion, flaming, furious)
 from boxes import LootBox
 from room import Room
 
@@ -67,8 +67,8 @@ class World():
     @staticmethod
     def get_random_monster(loot = None):
         creature = random.choice([Soldier, Goblin, Mage, Knight, Mimic])
-        strong = random.choice([Undead, Beastly, Demonic, Frozen, Cursed])
-        super_m = random.choice([Champion, Flaming, Furious])
+        strong = random.choice([undead, beastly, demonic, frozen, cursed])
+        super_m = random.choice([champion, flaming, furious])
         monster = creature(loot)
         if random.randint(1,3) == 1:
             monster = strong(monster)

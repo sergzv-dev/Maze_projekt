@@ -2,19 +2,20 @@
 
 import random
 
-class Creature():
-    def __init__(self):
-        self.name = None
-        self.attack = None
-        self.max_attack = None
-        self.shield = None
-        self.max_shield = None
-        self.hp = None
-        self.max_hp = None
-        self.agility = None
-        self.max_agility = None
+class Creature:
+    def __init__(self, *args, **kwargs):
+        self.name = kwargs.get('name', 'creature')
+        self.attack = kwargs.get('attack', 1)
+        self.max_attack = kwargs.get('max_attack', 999)
+        self.shield = kwargs.get('shield', 1)
+        self.max_shield = kwargs.get('max_shield', 999)
+        self.hp = kwargs.get('hp', 1)
+        self.max_hp = kwargs.get('max_hp', 999)
+        self.agility = kwargs.get('agility', 1)
+        self.max_agility = kwargs.get('max_agility', 999)
         self.back_pack = []
         self.death_marker = False
+        self.after_death_act = None
 
     def heal_hp(self, value):
         self.hp = min(self.max_hp, self.hp + value)
@@ -44,19 +45,20 @@ class Creature():
 
 
 class Player(Creature):
-    def __init__(self, name):
-        super().__init__()
+    def __init__(self, name, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.name = name
-        self.attack = 10
-        self.max_attack = 100
-        self.shield = 10
-        self.max_shield = 50
-        self.hp = 100
-        self.max_hp = 100
-        self.agility = 5
-        self.max_agility = 40
+        self.attack = kwargs.get('attack', 10)
+        self.max_attack = kwargs.get('max_attack', 100)
+        self.shield = kwargs.get('shield', 10)
+        self.max_shield = kwargs.get('max_shield', 50)
+        self.hp = kwargs.get('hp', 100)
+        self.max_hp = kwargs.get('max_hp', 100)
+        self.agility = kwargs.get('agility', 5)
+        self.max_agility = kwargs.get('max_agility', 40)
         self.fight_marker = False
         self.open_bp = False
+
 
     def death_chek(self, game_state):
         last_chance_list = []
@@ -68,12 +70,8 @@ class Player(Creature):
 
 
 class Monster(Creature):
-    def __init__(self, loot = None):
-        super().__init__()
-        self.max_attack = 999
-        self.max_shield = 999
-        self.max_hp = 999
-        self.max_agility = 999
+    def __init__(self, loot = None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         if loot is not None:
             self.back_pack.append(loot)
 
@@ -81,16 +79,18 @@ class Monster(Creature):
         room = game_state.curr_room
         if self.hp < 1:
             room.loot += self.back_pack
-            room.monster = None
             game_state.player.fight_marker = False
+            if self.after_death_act:
+                self.after_death_act.execute(game_state)
+            room.monster = None
 
     def __repr__(self):
         return f'{self.name}'
 
 
 class Soldier(Monster):
-    def __init__(self, loot = None):
-        super().__init__(loot)
+    def __init__(self, loot=None, *args, **kwargs):
+        super().__init__(loot, *args, **kwargs)
         self.name = 'Soldier'
         self.attack = 7
         self.shield = 10
@@ -98,8 +98,8 @@ class Soldier(Monster):
         self.agility = 5
 
 class Goblin(Monster):
-    def __init__(self, loot = None):
-        super().__init__(loot)
+    def __init__(self, loot=None, *args, **kwargs):
+        super().__init__(loot, *args, **kwargs)
         self.name = 'Goblin'
         self.attack = 5
         self.shield = 0
@@ -107,8 +107,8 @@ class Goblin(Monster):
         self.agility = 15
 
 class Mage(Monster):
-    def __init__(self, loot = None):
-        super().__init__(loot)
+    def __init__(self, loot=None, *args, **kwargs):
+        super().__init__(loot, *args, **kwargs)
         self.name = 'Mage'
         self.attack = 12
         self.shield = 5
@@ -116,8 +116,8 @@ class Mage(Monster):
         self.agility = 0
 
 class Knight(Monster):
-    def __init__(self, loot = None):
-        super().__init__(loot)
+    def __init__(self, loot=None, *args, **kwargs):
+        super().__init__(loot, *args, **kwargs)
         self.name = 'Knight'
         self.attack = 9
         self.shield = 20
@@ -125,8 +125,8 @@ class Knight(Monster):
         self.agility = 5
 
 class Mimic(Monster):
-    def __init__(self, loot = None):
-        super().__init__(loot)
+    def __init__(self, loot=None, *args, **kwargs):
+        super().__init__(loot, *args, **kwargs)
         self.name = 'Mimic'
         self.attack = 8
         self.shield = 15
@@ -135,98 +135,78 @@ class Mimic(Monster):
 
 
 
-class StrongMonster(Monster):
-    def __init__(self, monster):
-        super().__init__()
-        self.max_attack = monster.max_attack
-        self.max_shield = monster.max_shield
-        self.max_hp = monster.max_hp
-        self.max_agility = monster.max_agility
-        self.back_pack = monster.back_pack
+# StrongMonsters:
 
-class Undead(StrongMonster):
-    def __init__(self, monster):
-        super().__init__(monster)
-        self.name = 'Undead ' + monster.name
-        self.attack = monster.attack + 2
-        self.shield = monster.shield + 10
-        self.hp = monster.hp + 20
-        self.agility = monster.agility
+def undead(monster):
+    monster.name = 'Undead ' + monster.name
+    monster.attack = monster.attack + 2
+    monster.shield = monster.shield + 10
+    monster.hp = monster.hp + 20
+    monster.agility = monster.agility
+    return monster
 
-class Beastly(StrongMonster):
-    def __init__(self, monster):
-        super().__init__(monster)
-        self.name = 'Beastly ' + monster.name
-        self.attack = monster.attack + 3
-        self.shield = monster.shield
-        self.hp = monster.hp + 15
-        self.agility = monster.agility + 5
+def beastly(monster):
+    monster.name = 'Beastly ' + monster.name
+    monster.attack = monster.attack + 3
+    monster.shield = monster.shield
+    monster.hp = monster.hp + 15
+    monster.agility = monster.agility + 5
+    return monster
 
-class Demonic(StrongMonster):
-    def __init__(self, monster):
-        super().__init__(monster)
-        self.name = 'Demonic ' + monster.name
-        self.attack = monster.attack + 5
-        self.shield = monster.shield + 5
-        self.hp = monster.hp + 30
-        self.agility = monster.agility + 5
-
-    def death_chek(self, game_state):
-        room = game_state.curr_room
-        ui = game_state.UI
-        player = game_state.player
-        if self.hp < 1:
-            room.loot += self.back_pack
-            room.monster = None
-            ui.say('The monster blowing up in the room!!!')
-            player.take_damage(50, game_state, death=False)
-            game_state.player.fight_marker = False
-
-class Frozen(StrongMonster):
-    def __init__(self, monster):
-        super().__init__(monster)
-        self.name = 'Frozen ' + monster.name
-        self.attack = monster.attack
-        self.shield = monster.shield + 15
-        self.hp = monster.hp + 10
-        self.agility = max(0, monster.agility - 5)
-
-class Cursed(StrongMonster):
-    def __init__(self, monster):
-        super().__init__(monster)
-        self.name = 'Cursed ' + monster.name
-        self.attack = monster.attack + 4
-        self.shield = monster.shield
-        self.hp = monster.hp + 10
-        self.agility = max(0, monster.agility - 5)
+def demonic(monster):
+    monster.name = 'Demonic ' + monster.name
+    monster.attack = monster.attack + 5
+    monster.shield = monster.shield + 5
+    monster.hp = monster.hp + 30
+    monster.agility = monster.agility + 5
+    monster.after_death_act = ExplosionMod()
+    return monster
 
 
-class SuperMonster(StrongMonster):
-    pass
+def frozen(monster):
+    monster.name = 'Frozen ' + monster.name
+    monster.attack = monster.attack
+    monster.shield = monster.shield + 15
+    monster.hp = monster.hp + 10
+    monster.agility = max(0, monster.agility - 5)
+    return monster
 
-class Champion(SuperMonster):
-    def __init__(self, st_monster):
-        super().__init__(st_monster)
-        self.name = 'CHAMPION ' + st_monster.name.upper()
-        self.attack = st_monster.attack
-        self.shield = st_monster.shield + 20
-        self.hp = st_monster.hp + 50
-        self.agility = st_monster.agility + 10
+def cursed(monster):
+    monster.name = 'Cursed ' + monster.name
+    monster.attack = monster.attack + 4
+    monster.shield = monster.shield
+    monster.hp = monster.hp + 10
+    monster.agility = max(0, monster.agility - 5)
+    return monster
 
-class Flaming(SuperMonster):
-    def __init__(self, st_monster):
-        super().__init__(st_monster)
-        self.name = 'FLAMING ' + st_monster.name.upper()
-        self.attack = st_monster.attack + 8
-        self.shield = st_monster.shield
-        self.hp = st_monster.hp + 20
-        self.agility = st_monster.agility
+# SuperMonsters:
 
-class Furious(SuperMonster):
-    def __init__(self, st_monster):
-        super().__init__(st_monster)
-        self.name = 'FURIOUS ' + st_monster.name.upper()
-        self.attack = st_monster.attack + 10
-        self.shield = st_monster.shield + 10
-        self.hp = st_monster.hp + 30
-        self.agility = st_monster.agility
+def champion(st_monster):
+    st_monster.name = 'CHAMPION ' + st_monster.name.upper()
+    st_monster.attack = st_monster.attack
+    st_monster.shield = st_monster.shield + 20
+    st_monster.hp = st_monster.hp + 50
+    st_monster.agility = st_monster.agility + 10
+    return st_monster
+
+def flaming(st_monster):
+    st_monster.name = 'FLAMING ' + st_monster.name.upper()
+    st_monster.attack = st_monster.attack + 8
+    st_monster.shield = st_monster.shield
+    st_monster.hp = st_monster.hp + 20
+    st_monster.agility = st_monster.agility
+    return st_monster
+
+def furious(st_monster):
+    st_monster.name = 'FURIOUS ' + st_monster.name.upper()
+    st_monster.attack = st_monster.attack + 10
+    st_monster.shield = st_monster.shield + 10
+    st_monster.hp = st_monster.hp + 30
+    st_monster.agility = st_monster.agility
+    return st_monster
+
+
+class ExplosionMod:
+    def execute(self, game_state):
+        game_state.UI.say('The monster blowing up in the room!!!')
+        game_state.player.take_damage(50, game_state, death=False)
