@@ -7,11 +7,11 @@ class Creature:
         self.name = kwargs.get('name', 'creature')
         self.attack = kwargs.get('attack', 1)
         self.max_attack = kwargs.get('max_attack', 999)
-        self.shield = kwargs.get('shield', 1)
+        self.shield = kwargs.get('shield', 0)
         self.max_shield = kwargs.get('max_shield', 999)
-        self.hp = kwargs.get('hp', 1)
+        self.hp = kwargs.get('hp', 10)
         self.max_hp = kwargs.get('max_hp', 999)
-        self.agility = kwargs.get('agility', 1)
+        self.agility = kwargs.get('agility', 0)
         self.max_agility = kwargs.get('max_agility', 999)
         self.back_pack = []
         self.death_marker = False
