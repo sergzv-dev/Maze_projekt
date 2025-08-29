@@ -1,6 +1,7 @@
 ''' Module contains classes for player and monsters'''
 
 import random
+import json
 
 class Creature:
     def __init__(self, *args, **kwargs):
@@ -67,6 +68,30 @@ class Player(Creature):
             self.death_marker = True
         if self.death_marker and last_chance_list:
             last_chance_list[0].last_chance(game_state)
+
+    def to_json(self):
+        data = self.__dict__
+        data['back_pack'] = [item.to_json() for item in self.back_pack]
+        return json.dumps(data)
+
+    @staticmethod
+    def from_json(json_data):
+        data = json.loads(json_data)
+        name = data.pop('name')
+        json_back_pack = data.pop('back_pack')
+        back_pack = [item.from_json() for item in json_back_pack.values()]
+        fight_marker = data.pop('fight_marker')
+        open_bp = data.pop('open_bp')
+        death_marker = data.pop('death_marker')
+        after_death_act = data.pop('after_death_act')
+
+        player = Player(name, **data)
+        player.back_pack = back_pack
+        player.fight_marker = fight_marker
+        player.open_bp = open_bp
+        player.death_marker = death_marker
+        player.after_death_act = after_death_act
+        return player
 
 
 class Monster(Creature):
