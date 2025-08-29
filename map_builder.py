@@ -10,7 +10,11 @@ from creatures import (Soldier, Goblin, Mage, Knight, Mimic, undead, beastly, de
 from boxes import LootBox
 from room import Room
 
-class World():
+class World:
+    def __init__(self, rooms_dict):
+        self.rooms_dict = rooms_dict
+
+class WorldBuilder:
     def __init__(self, x_line, y_line):
         self.size = (x_line, y_line)
         self.x_line = x_line
@@ -75,6 +79,11 @@ class World():
             if random.randint(1,5) == 1:
                 monster = super_m(monster)
         return monster
+
+    @staticmethod
+    def give_world(x_line, y_line):
+        world = WorldBuilder(x_line, y_line)
+        return world.rooms_dict
 
 
 def amount_of_monsters(rooms_dict):

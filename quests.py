@@ -1,5 +1,6 @@
 from treasures import Key, ImmortalAmulet
 from boxes import LootBox, Lock
+from map_builder import WorldBuilder
 import random
 
 class MainQuest():
@@ -21,5 +22,5 @@ class ImmortalAmuletQuest():
         altar_room = random.choice(list(rooms_dict.values()))
         altar_room.phoenix_altar = Lock(amulet)
         amulet_room = random.choice(list(rooms_dict.values()))
-        amulet_room.monster = world.get_random_monster(amulet)
+        amulet_room.monster = WorldBuilder.get_random_monster(amulet)
         return world

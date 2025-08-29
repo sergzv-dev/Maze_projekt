@@ -3,7 +3,7 @@
 from creatures import Player
 from room import name_convert
 from ui_terminal import UI
-from map_bilder import World
+from map_builder import World, WorldBuilder
 from game_states import GameState
 from game_endings import EndGame
 from actions import ActionProvider
@@ -14,7 +14,7 @@ def game():
     master = UI()
     name = master.ask("What is your name? ")
     player = Player(name)
-    world = World(10, 10)
+    world = World(WorldBuilder.give_world(10, 10))
     world = MainQuest.add_quest(world)
     world = ImmortalAmuletQuest.add_quest(world)
     curr_room = world.rooms_dict[name_convert('A1')]

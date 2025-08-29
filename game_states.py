@@ -1,7 +1,7 @@
 ''' Module contains states of current game'''
 import json
 from creatures import Player
-from map_bilder import World
+from map_builder import World
 
 class GameState():
     def __init__(self, master, world, player, curr_room):

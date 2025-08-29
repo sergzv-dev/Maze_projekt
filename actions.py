@@ -1,12 +1,10 @@
 ''' Module contains actions for the game'''
 
 from game_endings import IngloriousDeath, HappyEnd
-from game_states import GameState
-from game_endings import EndGame
 import random
 
 class Action():
-    def execute(self, game_state) -> GameState | EndGame:
+    def execute(self, game_state):
         pass
 
 class MoveAction(Action):
