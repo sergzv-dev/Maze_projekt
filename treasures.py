@@ -103,33 +103,6 @@ class SacrificeAmulet(Treasure):
         return 'sacrifice amulet'
 
 
-class Key(Treasure):
-    def __init__(self, name):
-        self.name = name
-        self.mode = 'quest'
-
-    def execute(self, game_state):
-        ui = game_state.UI
-        ui.say('You must find exit!')
-        return game_state
-
-    def __repr__(self):
-        return self.name
-
-class ImmortalAmulet(Treasure):
-    def __init__(self):
-        self.name = 'immortal amulet'
-        self.mode = 'quest'
-
-    def execute(self, game_state):
-        ui = game_state.UI
-        ui.say('You must find altar for sacrifice!')
-        return game_state
-
-    def __repr__(self):
-        return self.name
-
-
 class ResilienceMutagen(Treasure):
     def __init__(self):
         self.rarity = 1
@@ -187,7 +160,7 @@ class TrueBookOfPower(Treasure):
         player = game_state.player
         room = game_state.curr_room
         ui = game_state.UI
-        sacrifice = random.choice(list(filter(lambda item: getattr(item, 'mode', None) != 'quest', player.back_pack)))
+        sacrifice = random.choice([item for item in player.back_pack if not isinstance(item, QuestItem)])
         player.back_pack.remove(sacrifice)
         if room.monster:
             room.monster.take_damage(9999, game_state)
@@ -196,3 +169,30 @@ class TrueBookOfPower(Treasure):
 
     def __repr__(self):
         return 'true book of power'
+
+class QuestItem(Treasure):
+    def __init__(self, name, id_):
+        self.name = name
+        self.id_ = id_
+        self.mode = 'quest'
+        self.answer = '42'
+
+    def execute(self, game_state):
+        ui = game_state.UI
+        ui.say(self.answer)
+        return game_state
+
+    def __repr__(self):
+        return self.name
+
+
+class Key(QuestItem):
+    def __init__(self, name, ind):
+        super().__init__(name, ind)
+        self.answer = 'You must find exit!'
+
+
+class ImmortalAmulet(QuestItem):
+    def __init__(self, name, ind):
+        super().__init__(name, ind)
+        self.answer = 'You must find altar for sacrifice!'

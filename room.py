@@ -8,8 +8,7 @@ class Room():
         self.loot = []
         self.box = None
         self.room_searched = False
-        self.end_door = None
-        self.phoenix_altar = None
+        self.quest = None
 
     def __repr__(self):
         return name_convert(self.name)

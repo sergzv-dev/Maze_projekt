@@ -114,14 +114,16 @@ class EscapeAction(Action):
     def __repr__(self):
         return 'Escape the fight'
 
+class QuestAction(Action):
+    pass
 
-class EndDoorAction(Action):
+class EndDoorAction(QuestAction):
     def execute(self, game_state):
-        player = game_state.player
         ui = game_state.UI
         room = game_state.curr_room
+        key = room.quest.take_key(game_state)
 
-        if room.end_door.key in player.back_pack:
+        if key:
             return HappyEnd(game_state)
         else: ui.say('You don\'t have suitable key')
         return game_state
@@ -129,14 +131,14 @@ class EndDoorAction(Action):
     def __repr__(self):
         return 'Try to open old hidden door'
 
-class ImmortalAltarAction(Action):
+class ImmortalAltarAction(QuestAction):
     def execute(self, game_state):
         player = game_state.player
         ui = game_state.UI
         room = game_state.curr_room
-        amulet = room.phoenix_altar.key
+        amulet = room.quest.take_key(game_state)
 
-        if amulet in player.back_pack:
+        if amulet:
             player.increase_spec('max_hp', 10)
             player.hp = player.max_hp
             player.increase_spec('attack', 15)
@@ -177,8 +179,8 @@ class ActionProvider():
                 actions.append(OpenBox())
             if room.loot:
                 actions.append(GetItem())
-            if room.end_door:
+            if getattr(room.quest, 'sing', None) == 'EndDoor':
                 actions.append(EndDoorAction())
-            if room.phoenix_altar:
+            if getattr(room.quest, 'sing', None) == 'ImmortalAltar':
                 actions.append(ImmortalAltarAction())
         return actions + room_doors
