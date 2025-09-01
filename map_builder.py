@@ -14,6 +14,17 @@ class World:
     def __init__(self, rooms_dict):
         self.rooms_dict = rooms_dict
 
+    def to_json(self):
+        return [room.to_json() for room in self.rooms_dict.values()]
+
+    @staticmethod
+    def from_json(data):
+        rooms_dict = dict()
+        for room_data in data:
+            name = room_data.pop('name')
+            rooms_dict.update({name: Room.from_json(name, room_data)})
+        return World(rooms_dict)
+
 class WorldBuilder:
     def __init__(self, x_line, y_line):
         self.size = (x_line, y_line)

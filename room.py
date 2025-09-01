@@ -13,6 +13,13 @@ class Room():
     def __repr__(self):
         return name_convert(self.name)
 
+    def to_json(self):
+        pass
+
+    @staticmethod
+    def from_json(name, room_data):
+        pass
+
 def name_convert(name):
     if isinstance(name, tuple):
         return f'{chr(name[0] + 64)}{str(name[1])}'
