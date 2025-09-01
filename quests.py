@@ -9,7 +9,7 @@ class MainQuest():
     def add_quest(world):
         rooms_dict = world.rooms_dict
         id_ = str(uuid.uuid4())
-        end_g_key = Key('Golden key', id_)
+        end_g_key = Key(id_)
         end_door = QuestObject('EndDoor', id_)
         end_room = random.choice([room for room in rooms_dict.values() if room.quest is None])
         end_room.quest = end_door
@@ -22,7 +22,7 @@ class ImmortalAmuletQuest():
     def add_quest(world):
         rooms_dict = world.rooms_dict
         id_ = str(uuid.uuid4())
-        amulet = ImmortalAmulet('Immortal amulet', id_)
+        amulet = ImmortalAmulet(id_)
         altar = QuestObject('ImmortalAltar', id_)
         altar_room = random.choice([room for room in rooms_dict.values() if room.quest is None])
         altar_room.quest = altar

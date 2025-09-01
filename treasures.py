@@ -5,7 +5,13 @@ import random
 from game_endings import MissingInMase
 
 class Treasure(Action):
-    pass
+    def to_json(self):
+        return [f'{self.sign}', 'Treasure', None]
+
+    @staticmethod
+    def from_json(sign):
+        return treas_chek_list[sign]()
+
 
 class Medicine(Treasure):
     def __init__(self, name, hp, rarity):
@@ -25,19 +31,23 @@ class Medicine(Treasure):
 class LittleMedicine(Medicine):
     def __init__(self):
         super().__init__('little medicine', 10, 5)
+        self.sign = 'LittleMedicine'
 
 class MediumMedicine(Medicine):
     def __init__(self):
         super().__init__('medicine', 15, 3)
+        self.sign = 'MediumMedicine'
 
 class LargeMedicine(Medicine):
     def __init__(self):
         super().__init__('large medicine', 25, 1)
+        self.sign = 'LargeMedicine'
 
 
 class ImproveAttack(Treasure):
     def __init__(self):
         self.rarity = 1
+        self.sign = 'ImproveAttack'
 
     def execute(self, game_state):
         player = game_state.player
@@ -52,6 +62,7 @@ class ImproveAttack(Treasure):
 class ImproveShield(Treasure):
     def __init__(self):
         self.rarity = 1
+        self.sign = 'ImproveShield'
 
     def execute(self, game_state):
         player = game_state.player
@@ -66,6 +77,7 @@ class ImproveShield(Treasure):
 class FakePowerBook(Treasure):
     def __init__(self):
         self.rarity = 1
+        self.sign = 'FakePowerBook'
 
     def execute(self, game_state):
         player = game_state.player
@@ -84,6 +96,7 @@ class SacrificeAmulet(Treasure):
     def __init__(self):
         self.usage_check = 0
         self.rarity = 1
+        self.sign = 'SacrificeAmulet'
 
     def execute(self, game_state):
         player = game_state.player
@@ -106,6 +119,7 @@ class SacrificeAmulet(Treasure):
 class ResilienceMutagen(Treasure):
     def __init__(self):
         self.rarity = 1
+        self.sign = 'ResilienceMutagen'
 
     def execute(self, game_state):
         player = game_state.player
@@ -120,6 +134,7 @@ class Bomb(Treasure):
     def __init__(self):
         self.rarity = 1
         self.mode = 'bomb'
+        self.sign = 'Bomb'
 
     def execute(self, game_state):
         player = game_state.player
@@ -134,6 +149,7 @@ class PhoenixAmulet(Treasure):
     def __init__(self):
         self.rarity = 1
         self.mode = 'raise'
+        self.sign = 'PhoenixAmulet'
 
     def execute(self, game_state):
         ui = game_state.UI
@@ -155,6 +171,7 @@ class PhoenixAmulet(Treasure):
 class TrueBookOfPower(Treasure):
     def __init__(self):
         self.rarity = 1
+        self.sign = 'TrueBookOfPower'
 
     def execute(self, game_state):
         player = game_state.player
@@ -171,8 +188,9 @@ class TrueBookOfPower(Treasure):
         return 'true book of power'
 
 class QuestItem(Treasure):
-    def __init__(self, name, id_):
-        self.name = name
+    def __init__(self, id_):
+        self.sign = 'QuestItem'
+        self.name = 'quest treasure'
         self.id_ = id_
         self.mode = 'quest'
         self.answer = '42'
@@ -185,14 +203,31 @@ class QuestItem(Treasure):
     def __repr__(self):
         return self.name
 
+    def to_json(self):
+        return [self.sign, 'QuestItem', self.id_]
+
+    @staticmethod
+    def from_json(sign, id_):
+        return treas_chek_list[sign](id_)
+
 
 class Key(QuestItem):
-    def __init__(self, name, ind):
-        super().__init__(name, ind)
+    def __init__(self, id_):
+        super().__init__(id_)
+        self.name = 'Golden Key'
         self.answer = 'You must find exit!'
+        self.sign = 'Key'
 
 
 class ImmortalAmulet(QuestItem):
-    def __init__(self, name, ind):
-        super().__init__(name, ind)
+    def __init__(self, id_):
+        super().__init__(id_)
+        self.name = 'Immortal amulet'
         self.answer = 'You must find altar for sacrifice!'
+        self.sign = 'ImmortalAmulet'
+
+treas_chek_list = {'LittleMedicine': LittleMedicine, 'MediumMedicine': MediumMedicine, 'LargeMedicine': LargeMedicine,
+                   'ImproveAttack': ImproveAttack, 'ImproveShield': ImproveShield, 'FakePowerBook': FakePowerBook,
+                   'SacrificeAmulet': SacrificeAmulet, 'ResilienceMutagen': ResilienceMutagen, 'Bomb': Bomb,
+                   'PhoenixAmulet': PhoenixAmulet, 'TrueBookOfPower': TrueBookOfPower, 'QuestItem': QuestItem,
+                   'Key': Key, 'ImmortalAmulet': ImmortalAmulet}
