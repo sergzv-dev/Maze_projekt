@@ -5,13 +5,7 @@ import uuid
 
 
 class Quest():
-    def to_json(self):
-        pass
-
-    @staticmethod
-    def from_json(sign):
-        pass
-
+    pass
 
 class MainQuest(Quest):
     @staticmethod
@@ -54,3 +48,12 @@ class QuestObject():
                 if key.id_ == self.id_:
                     return key
         return None
+
+    def to_json(self):
+        return self.__dict__
+
+    @staticmethod
+    def from_json(data):
+        sing = data['sing']
+        id_ = data['id_']
+        return QuestObject(sing, id_)

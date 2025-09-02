@@ -114,6 +114,22 @@ class EscapeAction(Action):
     def __repr__(self):
         return 'Escape the fight'
 
+class SaveGame(Action):
+    def execute(self, game_state):
+        game_state = game_state.save_game()
+        return game_state
+
+    def __repr__(self):
+        return 'Save game'
+
+class LoadGame(Action):
+    def execute(self, game_state):
+        game_state = game_state.load_game()
+        return game_state
+
+    def __repr__(self):
+        return 'Load game'
+
 class QuestAction(Action):
     pass
 
@@ -159,11 +175,12 @@ class ActionProvider():
         player = game_state.player
         player_act = [ShowSpecs(), OpenBackPack()]
         bp_actions = [CloseAction()]
+        opt_actions = [SaveGame(), LoadGame()]
         if player.open_bp:
             return bp_actions + player.back_pack
         if player.fight_marker:
             return [FightAction(), EscapeAction()] + player_act
-        return player_act + ActionProvider.room_act_gen(game_state)
+        return player_act + ActionProvider.room_act_gen(game_state) + opt_actions
 
     @staticmethod
     def room_act_gen(game_state):

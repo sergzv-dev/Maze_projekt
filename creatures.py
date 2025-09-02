@@ -43,6 +43,12 @@ class Creature:
     def death_chek(self, game_state):
         pass
 
+    def to_json(self):
+        data = self.__dict__
+        data['back_pack'] = [item.to_json() for item in self.back_pack]
+        if self.after_death_act is not None:
+            data['after_death_act'] = self.after_death_act.to_json()
+        return data
 
 class Player(Creature):
     def __init__(self, name, *args, **kwargs):
@@ -68,10 +74,6 @@ class Player(Creature):
         if self.death_marker and last_chance_list:
             last_chance_list[0].last_chance(game_state)
 
-    def to_json(self):
-        data = self.__dict__
-        data['back_pack'] = [item.to_json() for item in self.back_pack]
-        return data
 
     @staticmethod
     def from_json(data):
@@ -83,7 +85,6 @@ class Player(Creature):
         fight_marker = data.pop('fight_marker')
         open_bp = data.pop('open_bp')
         death_marker = data.pop('death_marker')
-        after_death_act = data.pop('after_death_act')
 
         player = Player(name, **data)
 
@@ -91,7 +92,6 @@ class Player(Creature):
         player.fight_marker = fight_marker
         player.open_bp = open_bp
         player.death_marker = death_marker
-        player.after_death_act = after_death_act
         return player
 
 
@@ -113,12 +113,25 @@ class Monster(Creature):
     def __repr__(self):
         return f'{self.name}'
 
-    def to_json(self):
-        pass
 
     @staticmethod
-    def from_json(mon_data):
-        pass
+    def from_json(data):
+        from treasures import take_treasures_list
+
+        bp_data = data.pop('back_pack')
+        back_pack = take_treasures_list(bp_data)
+        death_marker = data.pop('death_marker')
+        ada_sign = data.pop('after_death_act')
+        after_death_act = None
+        if ada_sign is not None:
+            after_death_act = AfterDeathAction.from_json(ada_sign)
+
+        monster = Monster(**data)
+
+        monster.back_pack = back_pack
+        monster.death_marker = death_marker
+        monster.after_death_act = after_death_act
+        return monster
 
 class Soldier(Monster):
     def __init__(self, loot=None, *args, **kwargs):
@@ -237,8 +250,21 @@ def furious(st_monster):
     st_monster.agility = st_monster.agility
     return st_monster
 
+class AfterDeathAction:
+    def to_json(self):
+        return self.sign
 
-class ExplosionMod:
+    @staticmethod
+    def from_json(sign):
+        return aft_death_chek_dict[sign]()
+
+
+class ExplosionMod(AfterDeathAction):
+    def __init__(self):
+        self.sign = 'ExplosionMod'
+
     def execute(self, game_state):
         game_state.UI.say('The monster blowing up in the room!!!')
         game_state.player.take_damage(50, game_state, death=False)
+
+aft_death_chek_dict = {'ExplosionMod': ExplosionMod}

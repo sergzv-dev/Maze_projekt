@@ -10,7 +10,7 @@ class Treasure(Action):
 
     @staticmethod
     def from_json(sign):
-        return treas_chek_list[sign]()
+        return treas_chek_dict[sign]()
 
 
 class Medicine(Treasure):
@@ -208,7 +208,7 @@ class QuestItem(Treasure):
 
     @staticmethod
     def from_json(sign, id_):
-        return treas_chek_list[sign](id_)
+        return treas_chek_dict[sign](id_)
 
 
 class Key(QuestItem):
@@ -226,7 +226,7 @@ class ImmortalAmulet(QuestItem):
         self.answer = 'You must find altar for sacrifice!'
         self.sign = 'ImmortalAmulet'
 
-treas_chek_list = {'LittleMedicine': LittleMedicine, 'MediumMedicine': MediumMedicine, 'LargeMedicine': LargeMedicine,
+treas_chek_dict = {'LittleMedicine': LittleMedicine, 'MediumMedicine': MediumMedicine, 'LargeMedicine': LargeMedicine,
                    'ImproveAttack': ImproveAttack, 'ImproveShield': ImproveShield, 'FakePowerBook': FakePowerBook,
                    'SacrificeAmulet': SacrificeAmulet, 'ResilienceMutagen': ResilienceMutagen, 'Bomb': Bomb,
                    'PhoenixAmulet': PhoenixAmulet, 'TrueBookOfPower': TrueBookOfPower, 'QuestItem': QuestItem,

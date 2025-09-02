@@ -6,8 +6,10 @@ class LootBox():
         return 'box'
 
     def to_json(self):
-        pass
+        return self.loot.to_json()
 
     @staticmethod
     def from_json(box_data):
-        pass
+        from treasures import take_treasure_item
+        box = LootBox(take_treasure_item(box_data))
+        return box

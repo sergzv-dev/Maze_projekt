@@ -8,15 +8,16 @@ class GameState():
         self.world = world
         self.curr_room = curr_room
 
-    def save_game(self, file_link):
+    def save_game(self, file_link = 'save_data.json'):
         with open(file_link, 'w') as f:
             f.write(self.to_json())
+        return self
 
-    def load_game(self, file_link):
+    def load_game(self, file_link = 'save_data.json'):
         with open(file_link, 'r') as f:
             json_data = f.read()
             game_state = self.from_json(json_data)
-            return game_state
+        return game_state
 
     def to_json(self):
         player = self.player.to_json()

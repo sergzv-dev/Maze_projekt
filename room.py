@@ -15,16 +15,19 @@ class Room():
 
     def to_json(self):
         data = self.__dict__
-        data['monster'] = self.monster.to_json()
+        if self.monster is not None:
+            data['monster'] = self.monster.to_json()
+        if self.box is not None:
+            data['box'] = self.box.to_json()
+        if self.quest is not None:
+            data['quest'] = self.quest.to_json()
         data['loot'] = [item.to_json() for item in self.loot]
-        data['box'] = self.box.to_json()
-        data['quest'] = self.quest.to_json()
         return data
 
     @staticmethod
     def from_json(name, room_data):
         from creatures import Monster
-        from quests import Quest
+        from quests import QuestObject
         from treasures import take_treasures_list
         from boxes import LootBox
 
@@ -34,7 +37,7 @@ class Room():
         room.loot = take_treasures_list(room_data['loot'])
         room.box = LootBox.from_json(room_data['box'])
         room.room_searched = room_data['room_searched']
-        room.quest = Quest.from_json(room_data['quest'])
+        room.quest = QuestObject.from_json(room_data['quest'])
         return room
 
 def name_convert(name):
