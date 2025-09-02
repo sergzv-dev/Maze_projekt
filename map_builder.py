@@ -7,7 +7,6 @@ from treasures import (LittleMedicine, MediumMedicine, LargeMedicine, ImproveAtt
                        )
 from creatures import (Soldier, Goblin, Mage, Knight, Mimic, undead, beastly, demonic, frozen, cursed,
                        champion, flaming, furious)
-from boxes import LootBox
 from room import Room
 
 class World:
@@ -65,6 +64,7 @@ class WorldBuilder:
         
 
     def add_loot(self):
+        from boxes import LootBox
         for room in list(self.rooms_dict.values()):
             if random.randint(1, 3) == 1:
                 room.box = LootBox(self.get_random_treasure(self.treasures_list))

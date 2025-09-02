@@ -1,6 +1,5 @@
 from treasures import QuestItem, Key, ImmortalAmulet
 from boxes import LootBox
-from map_builder import WorldBuilder
 import random
 import uuid
 
@@ -30,6 +29,8 @@ class MainQuest(Quest):
 class ImmortalAmuletQuest(Quest):
     @staticmethod
     def add_quest(world):
+        from map_builder import WorldBuilder
+
         rooms_dict = world.rooms_dict
         id_ = str(uuid.uuid4())
         amulet = ImmortalAmulet(id_)
