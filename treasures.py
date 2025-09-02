@@ -231,3 +231,22 @@ treas_chek_list = {'LittleMedicine': LittleMedicine, 'MediumMedicine': MediumMed
                    'SacrificeAmulet': SacrificeAmulet, 'ResilienceMutagen': ResilienceMutagen, 'Bomb': Bomb,
                    'PhoenixAmulet': PhoenixAmulet, 'TrueBookOfPower': TrueBookOfPower, 'QuestItem': QuestItem,
                    'Key': Key, 'ImmortalAmulet': ImmortalAmulet}
+
+def take_treasures_list(trs_data):
+    trs_list = []
+    for sign, kind, id_ in trs_data:
+        if kind == 'Treasure':
+            trs_list.append(Treasure.from_json(sign))
+        if kind == 'QuestItem':
+            trs_list.append(QuestItem.from_json(sign, id_))
+    return trs_list
+
+def take_treasure_item(trs_data):
+    item = None
+    if trs_data is not None:
+        sign, kind, id_ =  trs_data
+        if kind == 'Treasure':
+            item = Treasure.from_json(sign)
+        if kind == 'QuestItem':
+            item = QuestItem.from_json(sign, id_)
+    return item

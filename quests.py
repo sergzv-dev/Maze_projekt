@@ -4,7 +4,17 @@ from map_builder import WorldBuilder
 import random
 import uuid
 
-class MainQuest():
+
+class Quest():
+    def to_json(self):
+        pass
+
+    @staticmethod
+    def from_json(sign):
+        pass
+
+
+class MainQuest(Quest):
     @staticmethod
     def add_quest(world):
         rooms_dict = world.rooms_dict
@@ -17,7 +27,7 @@ class MainQuest():
         key_room.box = LootBox(end_g_key)
         return world
 
-class ImmortalAmuletQuest():
+class ImmortalAmuletQuest(Quest):
     @staticmethod
     def add_quest(world):
         rooms_dict = world.rooms_dict

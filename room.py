@@ -1,4 +1,8 @@
 ''' Module contains room class and name_convert function'''
+from treasures import take_treasures_list
+from creatures import Monster
+from boxes import LootBox
+from quests import Quest
 
 class Room():
     def __init__(self, name):
@@ -14,11 +18,24 @@ class Room():
         return name_convert(self.name)
 
     def to_json(self):
-        pass
+        data = self.__dict__
+        data['monster'] = self.monster.to_json()
+        data['loot'] = [item.to_json() for item in self.loot]
+        data['box'] = self.box.to_json()
+        data['quest'] = self.quest.to_json()
+        return data
 
     @staticmethod
     def from_json(name, room_data):
-        pass
+        room = Room(name)
+        room.doors = room_data['doors']
+        room.monster = Monster.from_json(room_data['monster'])
+        room.loot = take_treasures_list(room_data['loot'])
+        room.box = LootBox.from_json(room_data['box'])
+        room.room_searched = room_data['room_searched']
+        room.quest = Quest.from_json(room_data['quest'])
+        return room
+
 
 def name_convert(name):
     if isinstance(name, tuple):

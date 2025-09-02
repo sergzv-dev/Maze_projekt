@@ -1,7 +1,7 @@
 ''' Module contains classes for player and monsters'''
 
 import random
-from treasures import Treasure, QuestItem
+from treasures import take_treasures_list
 
 class Creature:
     def __init__(self, *args, **kwargs):
@@ -78,7 +78,7 @@ class Player(Creature):
     def from_json(data):
         name = data.pop('name')
         bp_data = data.pop('back_pack')
-        back_pack = Player.treasure_convertor(bp_data)
+        back_pack = take_treasures_list(bp_data)
         fight_marker = data.pop('fight_marker')
         open_bp = data.pop('open_bp')
         death_marker = data.pop('death_marker')
@@ -92,16 +92,6 @@ class Player(Creature):
         player.death_marker = death_marker
         player.after_death_act = after_death_act
         return player
-
-    @staticmethod
-    def treasure_convertor(bp_data):
-        back_pack = []
-        for sign, kind, id_ in bp_data:
-            if kind == 'Treasure':
-                back_pack.append(Treasure.from_json(sign))
-            if kind == 'QuestItem':
-                back_pack.append(QuestItem.from_json(sign, id_))
-        return back_pack
 
 
 class Monster(Creature):
@@ -122,6 +112,12 @@ class Monster(Creature):
     def __repr__(self):
         return f'{self.name}'
 
+    def to_json(self):
+        pass
+
+    @staticmethod
+    def from_json(mon_data):
+        pass
 
 class Soldier(Monster):
     def __init__(self, loot=None, *args, **kwargs):
