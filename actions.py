@@ -168,8 +168,9 @@ class ActionProvider():
     @staticmethod
     def room_act_gen(game_state):
         actions = []
+        rooms_dict = game_state.world.rooms_dict
         room = game_state.curr_room
-        room_doors = [MoveAction(door) for door in room.doors]
+        room_doors = [MoveAction(rooms_dict[door]) for door in room.doors]
         if not room.room_searched:
             actions = [SearchAction()]
         elif room.monster:

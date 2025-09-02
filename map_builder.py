@@ -53,7 +53,7 @@ class WorldBuilder:
             for num in doors:
                 door = self.rooms_dict.get(num)
                 if door is not None:
-                    self.rooms_dict[(x, y)].doors.append(door)
+                    self.rooms_dict[(x, y)].doors.append(num)
 
     def add_monster(self):
         for room in list(self.rooms_dict.values()):
