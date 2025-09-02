@@ -1,7 +1,6 @@
 ''' Module contains classes for player and monsters'''
 
 import random
-from treasures import take_treasures_list
 
 class Creature:
     def __init__(self, *args, **kwargs):
@@ -76,6 +75,8 @@ class Player(Creature):
 
     @staticmethod
     def from_json(data):
+        from treasures import take_treasures_list
+
         name = data.pop('name')
         bp_data = data.pop('back_pack')
         back_pack = take_treasures_list(bp_data)
