@@ -34,5 +34,5 @@ class GameState():
         master = self.UI
         player = Player.from_json(data['player'])
         world = World.from_json(data['world'])
-        curr_room = world.rooms_dict(tuple(data['curr_room']))
+        curr_room = world.rooms_dict[tuple(data['curr_room'])]
         return GameState(master, world, player, curr_room)

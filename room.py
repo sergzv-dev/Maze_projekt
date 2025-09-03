@@ -25,19 +25,29 @@ class Room():
         return data
 
     @staticmethod
-    def from_json(name, room_data):
+    def from_json(room_data):
         from creatures import Monster
         from quests import QuestObject
         from treasures import take_treasures_list
         from boxes import LootBox
 
+        name = tuple(room_data.pop('name'))
+        doors = [tuple(door) for door in room_data['doors']]
+        monster = room_data.pop('monster')
+        loot = room_data.pop('loot')
+        box = room_data.pop('box')
+        quest = room_data.pop('quest')
+
         room = Room(name)
-        room.doors = room_data['doors']
-        room.monster = Monster.from_json(room_data['monster'])
-        room.loot = take_treasures_list(room_data['loot'])
-        room.box = LootBox.from_json(room_data['box'])
+        room.doors = doors
+        if monster:
+            room.monster = Monster.from_json(monster)
+        room.loot = take_treasures_list(loot)
+        if box:
+            room.box = LootBox.from_json(box)
         room.room_searched = room_data['room_searched']
-        room.quest = QuestObject.from_json(room_data['quest'])
+        if quest:
+            room.quest = QuestObject.from_json(quest)
         return room
 
 def name_convert(name):

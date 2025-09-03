@@ -20,8 +20,8 @@ class World:
     def from_json(data):
         rooms_dict = dict()
         for room_data in data:
-            name = tuple(room_data.pop('name'))
-            rooms_dict.update({name: Room.from_json(name, room_data)})
+            name = tuple(room_data['name'])
+            rooms_dict.update({name: Room.from_json(room_data)})
         return World(rooms_dict)
 
 class WorldBuilder:
@@ -30,10 +30,6 @@ class WorldBuilder:
         self.x_line = x_line
         self.y_line = y_line
         self.rooms_dict = dict()
-        self.treasures_list = [LittleMedicine, MediumMedicine, LargeMedicine, ImproveAttack,
-                               ImproveShield, FakePowerBook, SacrificeAmulet, ResilienceMutagen, Bomb,
-                               PhoenixAmulet, TrueBookOfPower
-                               ]
         self.map_builder()
         self.doors_builder()
         self.add_monster()
@@ -59,7 +55,7 @@ class WorldBuilder:
             loot = None
             if random.randint(1, 4) == 1:
                 if random.randint(1, 3) == 1:
-                    loot = self.get_random_treasure(self.treasures_list)
+                    loot = self.get_random_treasure()
                 room.monster = self.get_random_monster(loot)
         
 
@@ -67,11 +63,15 @@ class WorldBuilder:
         from boxes import LootBox
         for room in list(self.rooms_dict.values()):
             if random.randint(1, 3) == 1:
-                room.box = LootBox(self.get_random_treasure(self.treasures_list))
+                room.box = LootBox(self.get_random_treasure())
 
 
     @staticmethod
-    def get_random_treasure(treasures_list):
+    def get_random_treasure():
+        treasures_list = [LittleMedicine, MediumMedicine, LargeMedicine, ImproveAttack,
+                          ImproveShield, FakePowerBook, SacrificeAmulet, ResilienceMutagen, Bomb,
+                          PhoenixAmulet, TrueBookOfPower
+                          ]
         treas_choose = []
         for treas_clss_obj in treasures_list:
             treas_item = treas_clss_obj()
