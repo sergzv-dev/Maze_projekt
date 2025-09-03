@@ -14,7 +14,7 @@ class Room():
         return name_convert(self.name)
 
     def to_json(self):
-        data = self.__dict__
+        data = self.__dict__.copy()
         if self.monster is not None:
             data['monster'] = self.monster.to_json()
         if self.box is not None:

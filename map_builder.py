@@ -20,7 +20,7 @@ class World:
     def from_json(data):
         rooms_dict = dict()
         for room_data in data:
-            name = room_data.pop('name')
+            name = tuple(room_data.pop('name'))
             rooms_dict.update({name: Room.from_json(name, room_data)})
         return World(rooms_dict)
 

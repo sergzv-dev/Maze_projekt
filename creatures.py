@@ -44,7 +44,7 @@ class Creature:
         pass
 
     def to_json(self):
-        data = self.__dict__
+        data = self.__dict__.copy()
         data['back_pack'] = [item.to_json() for item in self.back_pack]
         if self.after_death_act is not None:
             data['after_death_act'] = self.after_death_act.to_json()

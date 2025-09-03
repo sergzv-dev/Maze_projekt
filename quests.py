@@ -50,7 +50,7 @@ class QuestObject():
         return None
 
     def to_json(self):
-        return self.__dict__
+        return self.__dict__.copy()
 
     @staticmethod
     def from_json(data):

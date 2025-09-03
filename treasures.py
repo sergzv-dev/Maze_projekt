@@ -243,10 +243,9 @@ def take_treasures_list(trs_data):
 
 def take_treasure_item(trs_data):
     item = None
-    if trs_data is not None:
-        sign, kind, id_ =  trs_data
-        if kind == 'Treasure':
-            item = Treasure.from_json(sign)
-        if kind == 'QuestItem':
-            item = QuestItem.from_json(sign, id_)
+    sign, kind, id_ =  trs_data
+    if kind == 'Treasure':
+        item = Treasure.from_json(sign)
+    if kind == 'QuestItem':
+        item = QuestItem.from_json(sign, id_)
     return item
