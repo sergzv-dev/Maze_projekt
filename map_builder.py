@@ -103,5 +103,5 @@ def amount_of_monsters(rooms_dict):
 
 def amount_of_boxes(rooms_dict):
     boxes = len([1 for room in rooms_dict.values() if room.box])
-    return print(f'amount of boxes {boxes}')
+    return print(f'amount of boxes {boxes}\n')
 

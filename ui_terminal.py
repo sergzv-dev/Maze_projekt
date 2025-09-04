@@ -18,4 +18,5 @@ class UI():
                 continue
 
     def say(self, text):
+        text += '\n'
         print(text)

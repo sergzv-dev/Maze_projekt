@@ -20,6 +20,8 @@ class Medicine(Treasure):
         self.rarity = rarity
 
     def execute(self, game_state):
+        ui = game_state.UI
+        ui.say(f'get healed {self.hp}')
         player = game_state.player
         player.heal_hp(self.hp)
         player.back_pack.remove(self)
@@ -50,6 +52,8 @@ class ImproveAttack(Treasure):
         self.sign = 'ImproveAttack'
 
     def execute(self, game_state):
+        ui = game_state.UI
+        ui.say('improved attack on 5 points')
         player = game_state.player
         player.increase_spec('attack', 5)
         player.back_pack.remove(self)
@@ -65,6 +69,8 @@ class ImproveShield(Treasure):
         self.sign = 'ImproveShield'
 
     def execute(self, game_state):
+        ui = game_state.UI
+        ui.say('improved shield on 5 points')
         player = game_state.player
         player.increase_spec('shield', 5)
         player.back_pack.remove(self)
@@ -99,6 +105,8 @@ class SacrificeAmulet(Treasure):
         self.sign = 'SacrificeAmulet'
 
     def execute(self, game_state):
+        ui = game_state.UI
+        ui.say('get healed 20 hp sacrificing your strength')
         player = game_state.player
         player.heal_hp(20)
         variation = random.choice((
@@ -122,6 +130,8 @@ class ResilienceMutagen(Treasure):
         self.sign = 'ResilienceMutagen'
 
     def execute(self, game_state):
+        ui = game_state.UI
+        ui.say('improved max hp on 10 points')
         player = game_state.player
         player.increase_spec('max_hp', 10)
         player.back_pack.remove(self)
@@ -139,11 +149,14 @@ class Bomb(Treasure):
     def execute(self, game_state):
         player = game_state.player
         ui = game_state.UI
-        player.take_damage(50, game_state, death=False)
         ui.say('the box suddenly explodes')
+        player.take_damage(50, game_state, death=False)
         if player.death_marker:
             return MissingInMase(game_state)
         return game_state
+
+    def __repr__(self):
+        return 'BOMB!!'
 
 class PhoenixAmulet(Treasure):
     def __init__(self):

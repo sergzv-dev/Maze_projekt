@@ -13,6 +13,8 @@ class MoveAction(Action):
 
     def execute(self, game_state):
         game_state.curr_room = self.target_room
+        ui = game_state.UI
+        ui.say(f'you enter the room {self.target_room}')
         return game_state
 
     def __repr__(self):
@@ -21,8 +23,19 @@ class MoveAction(Action):
 
 class SearchAction(Action):
     def execute(self, game_state):
+        ui = game_state.UI
         room = game_state.curr_room
         room.room_searched = True
+        if room.monster:
+            ui.say(f'there is {room.monster} lurking in a dark corner')
+        elif room.quest:
+            if room.quest.sign == 'EndDoor':
+                ui.say('you find old dusty door')
+            if room.quest.sign == 'ImmortalAltar':
+                ui.say('many candles in the room and circle of runes in the center')
+        elif room.box:
+            ui.say('this is looks like an old chest!')
+        else: ui.say('the rom is empty')
         return game_state
 
     def __repr__(self):
@@ -37,7 +50,8 @@ class FightAction(Action):
         monster.take_damage(player.attack, game_state)
         if monster.death_marker:
             return game_state
-        player.take_damage(monster.attack, game_state)
+        if not monster.death_marker:
+            player.take_damage(monster.attack, game_state)
         if player.death_marker:
             return IngloriousDeath(game_state)
         return game_state
@@ -48,6 +62,8 @@ class FightAction(Action):
 
 class GetItem(Action):
     def execute(self, game_state):
+        ui = game_state.UI
+        ui.say('picked up the loot')
         room = game_state.curr_room
         player = game_state.player
         player.back_pack += room.loot
@@ -79,17 +95,30 @@ class CloseAction(Action):
 
 class ShowSpecs(Action):
     def execute(self, game_state):
+        room = game_state.curr_room
         pl = game_state.player
-        specs = f'name: {pl.name}\nHP: {pl.hp}\nattack: {pl.attack}\nshield: {pl.shield}\nagility: {pl.agility}\n'
+        specs = f'room: {room} \nname: {pl.name}\nHP: {pl.hp}\nattack: {pl.attack}\nshield: {pl.shield}\nagility: {pl.agility}\n'
         game_state.UI.say(specs)
         return game_state
 
     def __repr__(self):
-        return 'Show specs'
+        return 'Show your own specs'
+
+class ShowMonstersSpecs(Action):
+    def execute(self, game_state):
+        mon = game_state.curr_room.monster
+        specs = f'name: {mon.name}\nHP: {mon.hp}\nattack: {mon.attack}\nshield: {mon.shield}\nagility: {mon.agility}\n'
+        game_state.UI.say(specs)
+        return game_state
+
+    def __repr__(self):
+        return 'Show monsters specs'
 
 class OpenBox(Action):
     def execute(self, game_state):
+        ui = game_state.UI
         room = game_state.curr_room
+        ui.say(f'you find {room.box.loot}')
         mode = getattr(room.box.loot,'mode', None)
         if mode == 'bomb':
             game_state = room.box.loot.execute(game_state)
@@ -104,6 +133,8 @@ class OpenBox(Action):
 
 class EscapeAction(Action):
     def execute(self, game_state):
+        ui = game_state.UI
+        ui.say(f'you try to sneak away')
         player = game_state.player
         monster = game_state.curr_room.monster
         if random.randint(1, 2) == 1:
@@ -179,7 +210,7 @@ class ActionProvider():
         if player.open_bp:
             return bp_actions + player.back_pack
         if player.fight_marker:
-            return [FightAction(), EscapeAction()] + player_act
+            return [FightAction(), EscapeAction(), ShowMonstersSpecs()] + player_act
         return player_act + ActionProvider.room_act_gen(game_state) + opt_actions
 
     @staticmethod

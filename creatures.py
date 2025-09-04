@@ -102,9 +102,13 @@ class Monster(Creature):
             self.back_pack.append(loot)
 
     def death_chek(self, game_state):
+        ui = game_state.UI
         room = game_state.curr_room
         if self.hp < 1:
-            room.loot += self.back_pack
+            ui.say(f'{self} is defeated')
+            if self.back_pack:
+                ui.say(f'the monster dropped the {self.back_pack[0]}')
+                room.loot += self.back_pack
             game_state.player.fight_marker = False
             if self.after_death_act:
                 self.after_death_act.execute(game_state)
