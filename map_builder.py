@@ -63,15 +63,16 @@ class WorldBuilder:
         from boxes import LootBox
         for room in list(self.rooms_dict.values()):
             if random.randint(1, 3) == 1:
-                room.box = LootBox(self.get_random_treasure())
+                room.box = LootBox(self.get_random_treasure(bomb_mode=True))
 
 
     @staticmethod
-    def get_random_treasure():
+    def get_random_treasure(bomb_mode=False):
         treasures_list = [LittleMedicine, MediumMedicine, LargeMedicine, ImproveAttack,
-                          ImproveShield, FakePowerBook, SacrificeAmulet, ResilienceMutagen, Bomb,
+                          ImproveShield, FakePowerBook, SacrificeAmulet, ResilienceMutagen,
                           PhoenixAmulet, TrueBookOfPower
                           ]
+        if bomb_mode: treasures_list += [Bomb]
         treas_choose = []
         for treas_clss_obj in treasures_list:
             treas_item = treas_clss_obj()
