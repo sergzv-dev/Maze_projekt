@@ -4,13 +4,22 @@ from actions import Action
 import random
 from game_endings import MissingInMase
 
+
 class Treasure(Action):
-    def to_json(self):
-        return [f'{self.sign}', 'Treasure', None]
+    _registry = {}
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(cls, **kwargs)
+        Treasure._registry[cls.__name__] = cls
+
+    def to_dict(self) -> dict:
+        return { "cls": self.__class__.__name__, **self.__dict__  }
 
     @staticmethod
-    def from_json(sign):
-        return treas_chek_dict[sign]()
+    def from_dict(data: dict) -> Treasure:
+        class_name = data.pop('cls')
+        cls = Treasure._registry[ class_name ]
+        return cls(**data)
 
 
 class Medicine(Treasure):

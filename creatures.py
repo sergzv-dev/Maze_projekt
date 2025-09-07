@@ -3,7 +3,7 @@
 import random
 
 class Creature:
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *, after_death_actions: list['AfterDeathAction'] = None, **kwargs):
         self.name = kwargs.get('name', 'creature')
         self.attack = kwargs.get('attack', 1)
         self.max_attack = kwargs.get('max_attack', 999)
@@ -15,7 +15,7 @@ class Creature:
         self.max_agility = kwargs.get('max_agility', 999)
         self.back_pack = []
         self.death_marker = False
-        self.after_death_act = None
+        self.after_death_actions = after_death_actions or []
 
     def heal_hp(self, value):
         self.hp = min(self.max_hp, self.hp + value)
@@ -264,11 +264,13 @@ class AfterDeathAction:
 
 
 class ExplosionMod(AfterDeathAction):
-    def __init__(self):
+    def __init__(self, hp=50):
+        self.hp = hp
         self.sign = 'ExplosionMod'
 
     def execute(self, game_state):
         game_state.UI.say('The monster blowing up in the room!!!')
-        game_state.player.take_damage(50, game_state, death=False)
+        game_state.player.take_damage(self.hp, game_state, death=False)
+        # а мы тут не хотим вернуть измененный game_state чтобы намекнуть что он мог мутировать?
 
 aft_death_chek_dict = {'ExplosionMod': ExplosionMod}

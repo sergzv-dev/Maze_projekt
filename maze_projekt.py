@@ -14,10 +14,10 @@ def game():
     master = UI()
     name = master.ask("What is your name? ")
     player = Player(name)
-    world = World(WorldBuilder.give_world(10, 10))
-    world = MainQuest.add_quest(world)
-    world = ImmortalAmuletQuest.add_quest(world)
-    curr_room = world.rooms_dict[name_convert('A1')]
+
+    world = WorldBuilder.build(10, 10, quests=[MainQuest, ImmortalAmuletQuest])
+    curr_room = world.get_room('A1')
+
     game_state = GameState(master, world, player, curr_room)
 
     while True:
