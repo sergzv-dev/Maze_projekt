@@ -264,11 +264,13 @@ class AfterDeathAction:
 
 
 class ExplosionMod(AfterDeathAction):
-    def __init__(self):
+    def __init__(self, hp=50):
+        self.hp = hp
         self.sign = 'ExplosionMod'
 
     def execute(self, game_state):
         game_state.UI.say('The monster blowing up in the room!!!')
-        game_state.player.take_damage(50, game_state, death=False)
+        game_state.player.take_damage(self.hp, game_state, death=False)
+        # а мы тут не хотим вернуть измененный game_state чтобы намекнуть что он мог мутировать?
 
 aft_death_chek_dict = {'ExplosionMod': ExplosionMod}
