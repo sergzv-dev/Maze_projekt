@@ -5,19 +5,26 @@ import random
 from game_endings import MissingInMase
 
 class Treasure(Action):
-    def to_json(self):
-        return [f'{self.sign}', 'Treasure', None]
+    _registry = dict()
+    rarity = 1
 
-    @staticmethod
-    def from_json(sign):
-        return treas_chek_dict[sign]()
+    def __init_subclass__(cls, **kwargs):
+        Treasure._registry[cls.__name__] = cls
+
+    def to_json(self) -> dict:
+        return {'cls': self.__class__.__name__, **self.__dict__}
+
+    @classmethod
+    def from_json(cls, data: dict) -> 'Treasure':
+        class_name = data.pop('cls')
+        cls_ = cls._registry[class_name]
+        return cls_(**data)
 
 
 class Medicine(Treasure):
-    def __init__(self, name, hp, rarity):
+    def __init__(self, name='medicine', hp=5):
         self.name = name
         self.hp = hp
-        self.rarity = rarity
 
     def execute(self, game_state):
         ui = game_state.UI
@@ -30,27 +37,27 @@ class Medicine(Treasure):
     def __repr__(self):
         return f'{self.name}'
 
+
 class LittleMedicine(Medicine):
-    def __init__(self):
-        super().__init__('little medicine', 10, 5)
-        self.sign = 'LittleMedicine'
+    rarity = 5
+
+    def __init__(self, name='little medicine', hp=10):
+        super().__init__(name, hp)
+
 
 class MediumMedicine(Medicine):
-    def __init__(self):
-        super().__init__('medicine', 15, 3)
-        self.sign = 'MediumMedicine'
+    rarity = 3
+
+    def __init__(self, name='medicine', hp=15):
+        super().__init__(name, hp)
+
 
 class LargeMedicine(Medicine):
-    def __init__(self):
-        super().__init__('large medicine', 25, 1)
-        self.sign = 'LargeMedicine'
+    def __init__(self, name='large medicine', hp=25):
+        super().__init__(name, hp)
 
 
 class ImproveAttack(Treasure):
-    def __init__(self):
-        self.rarity = 1
-        self.sign = 'ImproveAttack'
-
     def execute(self, game_state):
         ui = game_state.UI
         ui.say('improved attack on 5 points')
@@ -64,10 +71,6 @@ class ImproveAttack(Treasure):
 
 
 class ImproveShield(Treasure):
-    def __init__(self):
-        self.rarity = 1
-        self.sign = 'ImproveShield'
-
     def execute(self, game_state):
         ui = game_state.UI
         ui.say('improved shield on 5 points')
@@ -81,10 +84,6 @@ class ImproveShield(Treasure):
 
 
 class FakePowerBook(Treasure):
-    def __init__(self):
-        self.rarity = 1
-        self.sign = 'FakePowerBook'
-
     def execute(self, game_state):
         player = game_state.player
         ui = game_state.UI
@@ -99,10 +98,8 @@ class FakePowerBook(Treasure):
         return 'medicine'
 
 class SacrificeAmulet(Treasure):
-    def __init__(self):
-        self.usage_check = 0
-        self.rarity = 1
-        self.sign = 'SacrificeAmulet'
+    def __init__(self, usage_check = 0):
+        self.usage_check = usage_check
 
     def execute(self, game_state):
         ui = game_state.UI
@@ -125,10 +122,6 @@ class SacrificeAmulet(Treasure):
 
 
 class ResilienceMutagen(Treasure):
-    def __init__(self):
-        self.rarity = 1
-        self.sign = 'ResilienceMutagen'
-
     def execute(self, game_state):
         ui = game_state.UI
         ui.say('improved max hp on 10 points')
@@ -141,10 +134,7 @@ class ResilienceMutagen(Treasure):
         return 'resilience mutagen'
 
 class Bomb(Treasure):
-    def __init__(self):
-        self.rarity = 1
-        self.mode = 'bomb'
-        self.sign = 'Bomb'
+    mode = 'bomb'
 
     def execute(self, game_state):
         player = game_state.player
@@ -159,10 +149,7 @@ class Bomb(Treasure):
         return 'BOMB!!'
 
 class PhoenixAmulet(Treasure):
-    def __init__(self):
-        self.rarity = 1
-        self.mode = 'raise'
-        self.sign = 'PhoenixAmulet'
+    mode = 'raise'
 
     def execute(self, game_state):
         ui = game_state.UI
@@ -182,10 +169,6 @@ class PhoenixAmulet(Treasure):
         return 'phoenix amulet'
 
 class TrueBookOfPower(Treasure):
-    def __init__(self):
-        self.rarity = 1
-        self.sign = 'TrueBookOfPower'
-
     def execute(self, game_state):
         player = game_state.player
         room = game_state.curr_room
@@ -201,12 +184,12 @@ class TrueBookOfPower(Treasure):
         return 'true book of power'
 
 class QuestItem(Treasure):
-    def __init__(self, id_):
-        self.sign = 'QuestItem'
-        self.name = 'quest treasure'
+    mode = 'quest'
+    answer = '42'
+
+    def __init__(self, *, id_, name='quest treasure'):
+        self.name = name
         self.id_ = id_
-        self.mode = 'quest'
-        self.answer = '42'
 
     def execute(self, game_state):
         ui = game_state.UI
@@ -216,49 +199,25 @@ class QuestItem(Treasure):
     def __repr__(self):
         return self.name
 
-    def to_json(self):
-        return [self.sign, 'QuestItem', self.id_]
-
-    @staticmethod
-    def from_json(sign, id_):
-        return treas_chek_dict[sign](id_)
-
 
 class Key(QuestItem):
-    def __init__(self, id_):
-        super().__init__(id_)
-        self.name = 'Golden Key'
-        self.answer = 'You must find exit!'
-        self.sign = 'Key'
+    answer = 'You must find exit!'
+
+    def __init__(self, id_, name = 'Golden Key'):
+        super().__init__(id_ = id_, name = name)
 
 
 class ImmortalAmulet(QuestItem):
-    def __init__(self, id_):
-        super().__init__(id_)
-        self.name = 'Immortal amulet'
-        self.answer = 'You must find altar for sacrifice!'
-        self.sign = 'ImmortalAmulet'
+    answer = 'You must find altar for sacrifice!'
 
-treas_chek_dict = {'LittleMedicine': LittleMedicine, 'MediumMedicine': MediumMedicine, 'LargeMedicine': LargeMedicine,
-                   'ImproveAttack': ImproveAttack, 'ImproveShield': ImproveShield, 'FakePowerBook': FakePowerBook,
-                   'SacrificeAmulet': SacrificeAmulet, 'ResilienceMutagen': ResilienceMutagen, 'Bomb': Bomb,
-                   'PhoenixAmulet': PhoenixAmulet, 'TrueBookOfPower': TrueBookOfPower, 'QuestItem': QuestItem,
-                   'Key': Key, 'ImmortalAmulet': ImmortalAmulet}
+    def __init__(self, id_, name = 'Immortal amulet'):
+        super().__init__(id_ = id_, name = name)
 
 def take_treasures_list(trs_data):
     trs_list = []
-    for sign, kind, id_ in trs_data:
-        if kind == 'Treasure':
-            trs_list.append(Treasure.from_json(sign))
-        if kind == 'QuestItem':
-            trs_list.append(QuestItem.from_json(sign, id_))
+    for data in trs_data:
+            trs_list.append(Treasure.from_json(data))
     return trs_list
 
-def take_treasure_item(trs_data):
-    item = None
-    sign, kind, id_ =  trs_data
-    if kind == 'Treasure':
-        item = Treasure.from_json(sign)
-    if kind == 'QuestItem':
-        item = QuestItem.from_json(sign, id_)
-    return item
+def take_treasure_item(data):
+    return Treasure.from_json(data)
