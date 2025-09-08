@@ -13,26 +13,28 @@ class GameState():
             f.write(self.to_json())
         return self
 
-    def load_game(self, file_link = 'save_data.json'):
+    @staticmethod
+    def load_game(*, ui, file_link = 'save_data.json'):
         with open(file_link, 'r') as f:
             json_data = f.read()
-            game_state = self.from_json(json_data)
+            game_state = GameState.from_json(json_data, ui)
         return game_state
 
-    def to_json(self):
+    def to_json(self) -> str:
         player = self.player.to_json()
         world = self.world.to_json()
         curr_room = list(self.curr_room.name)
         data = {'player': player, 'world': world, 'curr_room': curr_room}
         return json.dumps(data)
 
-    def from_json(self, json_data):
+    @classmethod
+    def from_json(cls, json_data, ui) -> 'GameState':
         from creatures import Player
         from map_builder import World
 
         data = json.loads(json_data)
-        master = self.UI
+        master = ui
         player = Player.from_json(data['player'])
         world = World.from_json(data['world'])
         curr_room = world.rooms_dict[tuple(data['curr_room'])]
-        return GameState(master, world, player, curr_room)
+        return cls(master, world, player, curr_room)

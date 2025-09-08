@@ -151,8 +151,7 @@ def test_game_state():
     print(f'{json_data}')
     fjson_data = json.loads(json_data)
     print(f'{fjson_data}')
-    new_game_state = GameState(master, world=None, player=None, curr_room=None)
-    new_game_state = new_game_state.from_json(fjson_data)
+    new_game_state = GameState.from_json(fjson_data, master)
     print(f'{new_game_state.__dict__}')
     assert game_state.to_json() == new_game_state.to_json()
 

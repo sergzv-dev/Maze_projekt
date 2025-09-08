@@ -155,7 +155,8 @@ class SaveGame(Action):
 
 class LoadGame(Action):
     def execute(self, game_state):
-        game_state = game_state.load_game()
+        ui = game_state.UI
+        game_state = game_state.load_game(ui = ui)
         return game_state
 
     def __repr__(self):
