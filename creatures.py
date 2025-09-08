@@ -96,10 +96,12 @@ class Player(Creature):
 
 
 class Monster(Creature):
+    DEFAULTS = {}
     _registry = dict()
 
     def __init__(self, loot = None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        params = {**self.DEFAULTS, **kwargs}
+        super().__init__(*args, **params)
         if loot is not None:
             self.back_pack.append(loot)
 
@@ -150,24 +152,20 @@ class Monster(Creature):
         return monster
 
 class Soldier(Monster):
-    def __init__(self, loot=None, *args, name = 'Soldier', attack = 7, shield = 10, hp = 50, agility = 5, **kwargs):
-        super().__init__(loot, *args, name=name, attack=attack, shield=shield, hp=hp, agility=agility, **kwargs)
+    DEFAULTS = dict(name = 'Soldier', attack = 7, shield = 10, hp = 50, agility = 5)
 
 class Goblin(Monster):
-    def __init__(self, loot=None, *args, name = 'Goblin', attack = 5, shield = 0, hp = 30, agility = 15, **kwargs):
-        super().__init__(loot, *args, name=name, attack=attack, shield=shield, hp=hp, agility=agility, **kwargs)
+    DEFAULTS = dict(name = 'Goblin', attack = 5, shield = 0, hp = 30, agility = 15)
 
 class Mage(Monster):
-    def __init__(self, loot=None, *args, name = 'Mage', attack = 12, shield = 5, hp = 40, agility = 0, **kwargs):
-        super().__init__(loot, *args, name=name, attack=attack, shield=shield, hp=hp, agility=agility, **kwargs)
+    DEFAULTS = dict(name = 'Mage', attack = 12, shield = 5, hp = 40, agility = 0)
 
 class Knight(Monster):
-    def __init__(self, loot=None, *args, name = 'Knight', attack = 9, shield = 20, hp = 70, agility = 5, **kwargs):
-        super().__init__(loot, *args, name=name, attack=attack, shield=shield, hp=hp, agility=agility, **kwargs)
+    DEFAULTS = dict(name = 'Knight', attack = 9, shield = 20, hp = 70, agility = 5)
 
 class Mimic(Monster):
-    def __init__(self, loot=None, *args, name = 'Mimic', attack = 8, shield = 15, hp = 60, agility = 10, **kwargs):
-        super().__init__(loot, *args, name=name, attack=attack, shield=shield, hp=hp, agility=agility, **kwargs)
+    DEFAULTS = dict(name = 'Mimic', attack = 8, shield = 15, hp = 60, agility = 10)
+
 
 # StrongMonsters:
 
