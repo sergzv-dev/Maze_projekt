@@ -75,8 +75,8 @@ class Player(Creature):
             last_chance_list[0].last_chance(game_state)
 
 
-    @staticmethod
-    def from_json(data):
+    @classmethod
+    def from_json(cls, data):
         from treasures import take_treasures_list
 
         name = data.pop('name')
@@ -86,7 +86,7 @@ class Player(Creature):
         open_bp = data.pop('open_bp')
         death_marker = data.pop('death_marker')
 
-        player = Player(name, **data)
+        player = cls(name, **data)
 
         player.back_pack = back_pack
         player.fight_marker = fight_marker
@@ -96,10 +96,15 @@ class Player(Creature):
 
 
 class Monster(Creature):
+    _registry = dict()
+
     def __init__(self, loot = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if loot is not None:
             self.back_pack.append(loot)
+
+    def __init_subclass__(cls, **kwargs):
+        Monster._registry[cls.__name__] = cls
 
     def death_chek(self, game_state):
         ui = game_state.UI
@@ -118,10 +123,16 @@ class Monster(Creature):
     def __repr__(self):
         return f'{self.name}'
 
+    def to_json(self):
+        data = super().to_json()
+        data.update({'cls': self.__class__.__name__})
+        return data
 
-    @staticmethod
-    def from_json(data):
+    @classmethod
+    def from_json(cls, data):
         from treasures import take_treasures_list
+        class_name = data.pop('cls')
+        cls_ = cls._registry[class_name]
 
         bp_data = data.pop('back_pack')
         back_pack = take_treasures_list(bp_data)
@@ -131,7 +142,7 @@ class Monster(Creature):
         if ada_sign is not None:
             after_death_act = AfterDeathAction.from_json(ada_sign)
 
-        monster = Monster(**data)
+        monster = cls_(**data)
 
         monster.back_pack = back_pack
         monster.death_marker = death_marker
@@ -139,51 +150,24 @@ class Monster(Creature):
         return monster
 
 class Soldier(Monster):
-    def __init__(self, loot=None, *args, **kwargs):
-        super().__init__(loot, *args, **kwargs)
-        self.name = 'Soldier'
-        self.attack = 7
-        self.shield = 10
-        self.hp = 50
-        self.agility = 5
+    def __init__(self, loot=None, *args, name = 'Soldier', attack = 7, shield = 10, hp = 50, agility = 5, **kwargs):
+        super().__init__(loot, *args, name=name, attack=attack, shield=shield, hp=hp, agility=agility, **kwargs)
 
 class Goblin(Monster):
-    def __init__(self, loot=None, *args, **kwargs):
-        super().__init__(loot, *args, **kwargs)
-        self.name = 'Goblin'
-        self.attack = 5
-        self.shield = 0
-        self.hp = 30
-        self.agility = 15
+    def __init__(self, loot=None, *args, name = 'Goblin', attack = 5, shield = 0, hp = 30, agility = 15, **kwargs):
+        super().__init__(loot, *args, name=name, attack=attack, shield=shield, hp=hp, agility=agility, **kwargs)
 
 class Mage(Monster):
-    def __init__(self, loot=None, *args, **kwargs):
-        super().__init__(loot, *args, **kwargs)
-        self.name = 'Mage'
-        self.attack = 12
-        self.shield = 5
-        self.hp = 40
-        self.agility = 0
+    def __init__(self, loot=None, *args, name = 'Mage', attack = 12, shield = 5, hp = 40, agility = 0, **kwargs):
+        super().__init__(loot, *args, name=name, attack=attack, shield=shield, hp=hp, agility=agility, **kwargs)
 
 class Knight(Monster):
-    def __init__(self, loot=None, *args, **kwargs):
-        super().__init__(loot, *args, **kwargs)
-        self.name = 'Knight'
-        self.attack = 9
-        self.shield = 20
-        self.hp = 70
-        self.agility = 5
+    def __init__(self, loot=None, *args, name = 'Knight', attack = 9, shield = 20, hp = 70, agility = 5, **kwargs):
+        super().__init__(loot, *args, name=name, attack=attack, shield=shield, hp=hp, agility=agility, **kwargs)
 
 class Mimic(Monster):
-    def __init__(self, loot=None, *args, **kwargs):
-        super().__init__(loot, *args, **kwargs)
-        self.name = 'Mimic'
-        self.attack = 8
-        self.shield = 15
-        self.hp = 60
-        self.agility = 10
-
-
+    def __init__(self, loot=None, *args, name = 'Mimic', attack = 8, shield = 15, hp = 60, agility = 10, **kwargs):
+        super().__init__(loot, *args, name=name, attack=attack, shield=shield, hp=hp, agility=agility, **kwargs)
 
 # StrongMonsters:
 
@@ -256,22 +240,26 @@ def furious(st_monster):
     return st_monster
 
 class AfterDeathAction:
-    def to_json(self):
-        return self.sign
+    _registry = dict()
 
-    @staticmethod
-    def from_json(sign):
-        return aft_death_chek_dict[sign]()
+    def __init_subclass__(cls, **kwargs):
+        AfterDeathAction._registry[cls.__name__] = cls
+
+    def to_json(self) -> dict:
+        return {'cls': self.__class__.__name__, **self.__dict__}
+
+    @classmethod
+    def from_json(cls, data: dict) -> 'AfterDeathAction':
+        class_name = data.pop('cls')
+        cls_ = cls._registry[class_name]
+        return cls_(**data)
 
 
 class ExplosionMod(AfterDeathAction):
     def __init__(self, hp=50):
         self.hp = hp
-        self.sign = 'ExplosionMod'
 
     def execute(self, game_state):
         game_state.UI.say('The monster blowing up in the room!!!')
         game_state.player.take_damage(self.hp, game_state, death=False)
         return game_state
-
-aft_death_chek_dict = {'ExplosionMod': ExplosionMod}

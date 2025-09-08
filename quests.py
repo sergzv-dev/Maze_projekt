@@ -52,8 +52,8 @@ class QuestObject():
     def to_json(self):
         return self.__dict__.copy()
 
-    @staticmethod
-    def from_json(data):
+    @classmethod
+    def from_json(cls, data):
         sing = data['sing']
         id_ = data['id_']
-        return QuestObject(sing, id_)
+        return cls(sing, id_)

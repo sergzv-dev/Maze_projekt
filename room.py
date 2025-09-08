@@ -24,8 +24,8 @@ class Room():
         data['loot'] = [item.to_json() for item in self.loot]
         return data
 
-    @staticmethod
-    def from_json(room_data):
+    @classmethod
+    def from_json(cls, room_data):
         from creatures import Monster
         from quests import QuestObject
         from treasures import take_treasures_list
@@ -38,7 +38,7 @@ class Room():
         box = room_data.pop('box')
         quest = room_data.pop('quest')
 
-        room = Room(name)
+        room = cls(name)
         room.doors = doors
         if monster:
             room.monster = Monster.from_json(monster)
