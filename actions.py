@@ -102,7 +102,7 @@ class ShowSpecs(Action):
         return game_state
 
     def __repr__(self):
-        return 'Show your own specs'
+        return 'Show your\'s specs'
 
 class ShowMonstersSpecs(Action):
     def execute(self, game_state):

@@ -13,11 +13,11 @@ class GameState():
             f.write(self.to_json())
         return self
 
-    @staticmethod
-    def load_game(*, ui, file_link = 'save_data.json'):
+    @classmethod
+    def load_game(cls, *, ui, file_link = 'save_data.json'):
         with open(file_link, 'r') as f:
             json_data = f.read()
-            game_state = GameState.from_json(json_data, ui)
+            game_state = cls.from_json(json_data, ui)
         return game_state
 
     def to_json(self) -> str:

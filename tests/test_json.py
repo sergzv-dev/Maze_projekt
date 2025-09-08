@@ -154,4 +154,3 @@ def test_game_state():
     new_game_state = GameState.from_json(fjson_data, master)
     print(f'{new_game_state.__dict__}')
     assert game_state.to_json() == new_game_state.to_json()
-
