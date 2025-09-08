@@ -63,7 +63,7 @@ class FightAction(Action):
 class GetItem(Action):
     def execute(self, game_state):
         ui = game_state.UI
-        ui.say('picked up the loot')
+        ui.say('loot picked up')
         room = game_state.curr_room
         player = game_state.player
         player.back_pack += room.loot

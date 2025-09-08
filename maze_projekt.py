@@ -1,9 +1,8 @@
 '''Main game modul'''
 
 from creatures import Player
-from room import name_convert
 from ui_terminal import UI
-from map_builder import World, WorldBuilder
+from map_builder import WorldBuilder
 from game_states import GameState
 from game_endings import EndGame
 from actions import ActionProvider
@@ -14,10 +13,8 @@ def game():
     master = UI()
     name = master.ask("What is your name? ")
     player = Player(name)
-    world = World(WorldBuilder.give_world(10, 10))
-    world = MainQuest.add_quest(world)
-    world = ImmortalAmuletQuest.add_quest(world)
-    curr_room = world.rooms_dict[name_convert('A1')]
+    world = WorldBuilder.build(10, 10, quests = [MainQuest, ImmortalAmuletQuest])
+    curr_room = world.get_room('A1')
     game_state = GameState(master, world, player, curr_room)
 
     while True:

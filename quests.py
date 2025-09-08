@@ -23,7 +23,7 @@ class MainQuest(Quest):
 class ImmortalAmuletQuest(Quest):
     @staticmethod
     def add_quest(world):
-        from map_builder import WorldBuilder
+        from map_builder import get_random_monster
 
         rooms_dict = world.rooms_dict
         id_ = str(uuid.uuid4())
@@ -32,7 +32,7 @@ class ImmortalAmuletQuest(Quest):
         altar_room = random.choice([room for room in rooms_dict.values() if room.quest is None])
         altar_room.quest = altar
         amulet_room = random.choice(list(rooms_dict.values()))
-        amulet_room.monster = WorldBuilder.get_random_monster(amulet)
+        amulet_room.monster = get_random_monster(amulet)
         return world
 
 class QuestObject():
