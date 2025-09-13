@@ -51,17 +51,14 @@ class Creature:
         return data
 
 class Player(Creature):
+    DEFAULTS = dict(attack = 10, max_attack = 100, shield = 10, max_shield = 50, hp = 100, max_hp = 100,
+                    agility = 5, max_agility = 40
+                    )
+
     def __init__(self, name, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        params = {**self.DEFAULTS, **kwargs}
+        super().__init__(*args, **params)
         self.name = name
-        self.attack = kwargs.get('attack', 10)
-        self.max_attack = kwargs.get('max_attack', 100)
-        self.shield = kwargs.get('shield', 10)
-        self.max_shield = kwargs.get('max_shield', 50)
-        self.hp = kwargs.get('hp', 100)
-        self.max_hp = kwargs.get('max_hp', 100)
-        self.agility = kwargs.get('agility', 5)
-        self.max_agility = kwargs.get('max_agility', 40)
         self.fight_marker = False
         self.open_bp = False
 
@@ -96,7 +93,7 @@ class Player(Creature):
 
 
 class Monster(Creature):
-    DEFAULTS = {}
+    DEFAULTS = dict()
     _registry = dict()
 
     def __init__(self, loot = None, *args, **kwargs):
