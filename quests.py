@@ -40,6 +40,9 @@ class QuestObject():
         self.sing = sing
         self.id_ = id_
 
+    def get_action(self) -> 'Action':                       # интерфейс QuestObject
+        pass
+
     def take_key(self, game_state):
         player = game_state.player
         quest_items = [item for item in player.back_pack if isinstance(item, QuestItem)]
@@ -47,7 +50,6 @@ class QuestObject():
             for key in quest_items:
                 if key.id_ == self.id_:
                     return key
-        return None
 
     def to_json(self):
         return self.__dict__.copy()
