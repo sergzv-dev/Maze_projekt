@@ -229,8 +229,6 @@ class ActionProvider():
                 actions.append(OpenBox())
             if room.loot:
                 actions.append(GetItem())
-            if getattr(room.quest, 'sing', None) == 'EndDoor':
-                actions.append(EndDoorAction())
-            if getattr(room.quest, 'sing', None) == 'ImmortalAltar':
-                actions.append(ImmortalAltarAction())
+            if room.quest:                                      # TODO я бы конечно назвал это GameObject/InteractiveObject или как то похоже.
+                actions.append(room.quest.get_action())         # Quest объект уже есть, и не сразу понятно что это не он.
         return actions + room_doors

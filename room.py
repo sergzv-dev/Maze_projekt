@@ -33,7 +33,7 @@ class Room():
 
         name = tuple(room_data.pop('name'))
         doors = [tuple(door) for door in room_data['doors']]
-        monster = room_data.pop('monster')
+        monster = room_data['monster']
         loot = room_data.pop('loot')
         box = room_data.pop('box')
         quest = room_data.pop('quest')

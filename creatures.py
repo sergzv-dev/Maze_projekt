@@ -2,8 +2,36 @@
 
 import random
 
+
+class Backpack(list):
+
+    def to_json(self) -> list[dict]:
+        return [ item.to_json() for item in self ]
+
+    @classmethod
+    def from_json(cls, data: list[dict]) -> Backpack:
+        return cls([ Treasure.from_json(data) for item in data ])
+
+# разные опции использования
+# monster = chosen_monster_cls(loot=give_random_loot())
+#
+# monster = chosen_monster_cls().add_loot(give_random_loot())
+#
+# monster = chosen_monster_cls()
+# monster.add_loot(give_random_loot())
+#
+# monster = chosen_monster_cls()
+# monster.back_pack.append(give_random_loot())
+
+
 class Creature:
-    def __init__(self, *args, **kwargs):
+    max_attack = 999
+    DEFAULTS = {......}
+
+    def __init__(self, backpack=None, *args, **kwargs):
+        # self.name = name or self.DEFAULS['name']
+        # self.attack = attack or self.DEFAULS['attack']
+
         self.name = kwargs.get('name', 'creature')
         self.attack = kwargs.get('attack', 1)
         self.max_attack = kwargs.get('max_attack', 999)
@@ -13,9 +41,14 @@ class Creature:
         self.max_hp = kwargs.get('max_hp', 999)
         self.agility = kwargs.get('agility', 0)
         self.max_agility = kwargs.get('max_agility', 999)
-        self.back_pack = []
+        self.back_pack = backpack or Backpack()
         self.death_marker = False
         self.after_death_act = None
+
+    def add_loot(self, item):
+        self.back_pack.append(item)
+        return self
+
 
     def heal_hp(self, value):
         self.hp = min(self.max_hp, self.hp + value)
