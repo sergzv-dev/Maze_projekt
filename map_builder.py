@@ -34,7 +34,74 @@ class World:
         return sum([1 for room in self.rooms_dict.values() if room.box])
 
 class WorldBuilder:
-    @classmethod
+
+    def add_rooms(self, size_x: int, size_y: int) -> WorldBuilder:
+        self._add_rooms_params = size_x, size_y
+        return self
+
+
+    def add_monsters(self, *, monster_probability=0.25, loot_probability=0.33) -> WorldBuilder:
+        self._add_monsters_params = dict(monster_probability=monster_probability, loot_probability=loot_probability)
+        return self
+
+    def add_loot(self, *, box_probability=0.33) -> WorldBuilder:
+        self._add_loot_params = dict(box_probability=box_probability)
+        return self
+
+    def add_quests(self, *, quests: list['Quest']) -> WorldBuilder:
+        self._quests = quests
+        return self
+
+
+    def build(self):
+        # строим комнаты и двери
+        rooms_dict = self._build_rooms_dict(*self._add_rooms_params)
+        rooms_dict = self._doors_builder(rooms_dict)
+
+        # наполняем контентом
+        rooms_dict = self._add_monster(rooms_dict, **self._add_monsters_params )
+        rooms_dict = self._add_loot(rooms_dict, **self._add_loot_params)
+
+        world = World(rooms_dict)
+
+        # добавляем квесты
+        for quest in self._quests:
+            world = quest.add_quest(world)
+        return world
+
+_add_loot_params
+
+        self._rooms_dict = rooms_dict
+
+
+
+
+    @staticmethod
+    def _add_monster(rooms_dict, *, monster_probability=0.25, loot_probability=0.33) -> dict:
+        for room in rooms_dict.values():
+            if random.random() < monster_probability:
+                loot = get_random_treasure() if random.random() < loot_probability else None
+                room.monster = get_random_monster(loot)
+        return rooms_dict
+
+    @staticmethod
+    def _add_loot(rooms_dict, *, box_probability=0.33):
+        from boxes import LootBox
+        for room in rooms_dict.values():
+            room.box = LootBox(get_random_treasure(bomb_mode=True)) if random.random() < box_probability else None
+        return rooms_dict
+
+
+
+
+        for quest in quests:
+            world = quest.add_quest(world)
+        return self
+
+
+
+
+
     def build(cls, size_x, size_y, quests: list['Quest']):
         rooms_dict = cls.build_rooms_dict(size_x, size_y)
         rooms_dict = cls.doors_builder(rooms_dict)
@@ -47,7 +114,7 @@ class WorldBuilder:
         return world
 
     @staticmethod
-    def build_rooms_dict(x_line, y_line):
+    def _build_rooms_dict(x_line, y_line):
         rooms = dict()
         for x in range(1, x_line):
             for y in range(1, y_line):
@@ -55,28 +122,13 @@ class WorldBuilder:
         return rooms
 
     @staticmethod
-    def doors_builder(rooms_dict:dict) -> dict:
+    def _doors_builder(rooms_dict:dict) -> dict:
         for x, y in rooms_dict:
             doors = [(x+1, y), (x-1, y), (x, y+1), (x, y-1)]
             for num in doors:
                 door = rooms_dict.get(num)
                 if door is not None:
                     rooms_dict[(x, y)].doors.append(num)
-        return rooms_dict
-
-    @staticmethod
-    def add_monster(rooms_dict, *, monster_probability=0.25, loot_probability=0.33) -> dict:
-        for room in rooms_dict.values():
-            if random.random() < monster_probability:
-                loot = get_random_treasure() if random.random() < loot_probability else None
-                room.monster = get_random_monster(loot)
-        return rooms_dict
-        
-    @staticmethod
-    def add_loot(rooms_dict, *, dox_probability=0.33):
-        from boxes import LootBox
-        for room in rooms_dict.values():
-            room.box = LootBox(get_random_treasure(bomb_mode=True)) if random.random() < dox_probability else None
         return rooms_dict
 
 
