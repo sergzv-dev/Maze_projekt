@@ -1,6 +1,7 @@
 ''' Module contains classes for player and monsters'''
 
 import random
+from item_container import ItemContainer
 
 class Creature:
     def __init__(self, *args, **kwargs):
@@ -13,7 +14,7 @@ class Creature:
         self.max_hp = kwargs.get('max_hp', 999)
         self.agility = kwargs.get('agility', 0)
         self.max_agility = kwargs.get('max_agility', 999)
-        self.back_pack = []
+        self.back_pack = ItemContainer()
         self.death_marker = False
         self.after_death_act = None
 
@@ -45,7 +46,7 @@ class Creature:
 
     def to_json(self):
         data = self.__dict__.copy()
-        data['back_pack'] = [item.to_json() for item in self.back_pack]
+        data['back_pack'] = self.back_pack.to_json()
         if self.after_death_act is not None:
             data['after_death_act'] = self.after_death_act.to_json()
         return data
@@ -74,11 +75,9 @@ class Player(Creature):
 
     @classmethod
     def from_json(cls, data):
-        from treasures import take_treasures_list
-
         name = data.pop('name')
         bp_data = data.pop('back_pack')
-        back_pack = take_treasures_list(bp_data)
+        back_pack = ItemContainer.from_json(bp_data)
         fight_marker = data.pop('fight_marker')
         open_bp = data.pop('open_bp')
         death_marker = data.pop('death_marker')
@@ -129,12 +128,11 @@ class Monster(Creature):
 
     @classmethod
     def from_json(cls, data):
-        from treasures import take_treasures_list
         class_name = data.pop('cls')
         cls_ = cls._registry[class_name]
 
         bp_data = data.pop('back_pack')
-        back_pack = take_treasures_list(bp_data)
+        back_pack = ItemContainer.from_json(bp_data)
         death_marker = data.pop('death_marker')
         ada_sign = data.pop('after_death_act')
         after_death_act = None

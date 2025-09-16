@@ -10,6 +10,6 @@ class LootBox():
 
     @classmethod
     def from_json(cls, box_data):
-        from treasures import take_treasure_item
-        box = cls(take_treasure_item(box_data))
+        from treasures import Treasure
+        box = cls(Treasure.from_json(box_data))
         return box

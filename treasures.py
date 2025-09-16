@@ -212,12 +212,3 @@ class ImmortalAmulet(QuestItem):
 
     def __init__(self, id_, name = 'Immortal amulet'):
         super().__init__(id_ = id_, name = name)
-
-def take_treasures_list(trs_data):
-    trs_list = []
-    for data in trs_data:
-            trs_list.append(Treasure.from_json(data))
-    return trs_list
-
-def take_treasure_item(data):
-    return Treasure.from_json(data)

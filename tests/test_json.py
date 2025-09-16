@@ -13,14 +13,14 @@ def json_test(class_, obj):
     return new_obj
 
 def json_test_treasure(obj):
-    from treasures import take_treasure_item
+    from treasures import Treasure
     print(f'{obj.__dict__}')
     json_obj = obj.to_json()
     json_data = json.dumps(json_obj)
     print(f'{json_data}')
     fjson_data = json.loads(json_data)
     print(f'{fjson_data}')
-    new_class_obj = take_treasure_item(fjson_data)
+    new_class_obj = Treasure.from_json(fjson_data)
     print(f'{new_class_obj.__dict__}')
     assert obj.to_json() == new_class_obj.to_json()
 
@@ -82,8 +82,9 @@ def test_quest_test_treasures():
 
 def test_player():
     from creatures import Player
+    from item_container import ItemContainer
     obj = Player('test')
-    obj.back_pack = [take_treasure() for _ in range(10)]
+    obj.back_pack = ItemContainer([take_treasure() for _ in range(10)])
     json_test(Player, obj)
 
 def test_monster():
@@ -98,10 +99,11 @@ def test_quest_obj():
 
 def test_room1():
     from room import Room
+    from item_container import ItemContainer
     room = Room((3,4))
     room.doors = [(1,1),(1,2),(2,3)]
     room.monster = take_monster()
-    room.loot = [take_treasure()]
+    room.loot = ItemContainer([take_treasure()])
     room.box = take_box()
     room.quest = take_quest()
     new_room = json_test(Room, room)
