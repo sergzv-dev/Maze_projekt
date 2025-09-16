@@ -80,6 +80,13 @@ def test_quest_test_treasures():
         obj = treasure(id_)
         json_test_treasure(obj)
 
+def test_item_container():
+    from item_container import ItemContainer
+    obj = ItemContainer()
+    json_test(ItemContainer, obj)
+    obj = ItemContainer([take_treasure() for _ in range(10)])
+    json_test(ItemContainer, obj)
+
 def test_player():
     from creatures import Player
     from item_container import ItemContainer

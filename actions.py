@@ -76,7 +76,7 @@ class GetItem(Action):
         room = game_state.curr_room
         player = game_state.player
         player.back_pack += room.loot
-        room.loot = []
+        room.loot.clear()
         return game_state
 
     def __repr__(self):
