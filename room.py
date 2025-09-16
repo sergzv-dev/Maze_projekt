@@ -1,7 +1,7 @@
 ''' Module contains room class and name_convert function'''
 
 class Room():
-    def __init__(self, name):
+    def __init__(self, name: tuple):
         self.name = name
         self.doors = []
         self.monster = None
@@ -31,12 +31,12 @@ class Room():
         from treasures import take_treasures_list
         from boxes import LootBox
 
-        name = tuple(room_data.pop('name'))
+        name = tuple(room_data['name'])
         doors = [tuple(door) for door in room_data['doors']]
-        monster = room_data.pop('monster')
-        loot = room_data.pop('loot')
-        box = room_data.pop('box')
-        quest = room_data.pop('quest')
+        monster = room_data['monster']
+        loot = room_data['loot']
+        box = room_data['box']
+        quest = room_data['quest']
 
         room = cls(name)
         room.doors = doors
