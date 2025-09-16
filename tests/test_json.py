@@ -34,10 +34,11 @@ def take_box():
 
 def take_quest():
     from quests import QuestObject
+    from actions import EndDoorAction
     import uuid
-    sign = 'test'
+    quest_action = EndDoorAction
     id_ = str(uuid.uuid4())
-    return QuestObject(sign, id_)
+    return QuestObject(quest_action(), id_)
 
 def take_monster():
     import random
@@ -128,9 +129,8 @@ def test_world():
 
 def test_game_state():
     from creatures import Player
-    from room import name_convert
     from ui_terminal import UI
-    from map_builder import World, WorldBuilder
+    from map_builder import WorldBuilder
     from game_states import GameState
     from quests import MainQuest, ImmortalAmuletQuest
 

@@ -1,5 +1,6 @@
 from treasures import QuestItem, Key, ImmortalAmulet
 from boxes import LootBox
+from actions import Action, EndDoorAction, ImmortalAltarAction
 import random
 import uuid
 
@@ -13,7 +14,7 @@ class MainQuest(Quest):
         rooms_dict = world.rooms_dict
         id_ = str(uuid.uuid4())
         end_g_key = Key(id_=id_)
-        end_door = QuestObject('EndDoor', id_)
+        end_door = QuestObject(EndDoorAction(), id_)
         end_room = random.choice([room for room in rooms_dict.values() if room.quest is None])
         end_room.quest = end_door
         key_room = random.choice(list(rooms_dict.values()))
@@ -28,7 +29,7 @@ class ImmortalAmuletQuest(Quest):
         rooms_dict = world.rooms_dict
         id_ = str(uuid.uuid4())
         amulet = ImmortalAmulet(id_=id_)
-        altar = QuestObject('ImmortalAltar', id_)
+        altar = QuestObject(ImmortalAltarAction(), id_)
         altar_room = random.choice([room for room in rooms_dict.values() if room.quest is None])
         altar_room.quest = altar
         amulet_room = random.choice(list(rooms_dict.values()))
@@ -36,8 +37,8 @@ class ImmortalAmuletQuest(Quest):
         return world
 
 class QuestObject():
-    def __init__(self, sing, id_):
-        self.sing = sing
+    def __init__(self, quest_action, id_):
+        self.quest_action = quest_action.__class__.__name__
         self.id_ = id_
 
     def take_key(self, game_state):
@@ -47,13 +48,15 @@ class QuestObject():
             for key in quest_items:
                 if key.id_ == self.id_:
                     return key
-        return None
+
+    def get_action(self) -> 'Action':
+        return Action.take_class_from_reg(self.quest_action)
 
     def to_json(self):
         return self.__dict__.copy()
 
     @classmethod
     def from_json(cls, data):
-        sing = data['sing']
+        quest_action = Action.take_class_from_reg(data['quest_action'])()
         id_ = data['id_']
-        return cls(sing, id_)
+        return cls(quest_action, id_)

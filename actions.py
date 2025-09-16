@@ -4,8 +4,17 @@ from game_endings import IngloriousDeath, HappyEnd
 import random
 
 class Action():
+    _registry = dict()
+
     def execute(self, game_state):
         pass
+
+    def __init_subclass__(cls, **kwargs):
+        Action._registry[cls.__name__] = cls
+
+    @classmethod
+    def take_class_from_reg(cls, class_name):
+        return cls._registry[class_name]
 
 class MoveAction(Action):
     def __init__(self, target_room):
@@ -229,8 +238,6 @@ class ActionProvider():
                 actions.append(OpenBox())
             if room.loot:
                 actions.append(GetItem())
-            if getattr(room.quest, 'sing', None) == 'EndDoor':
-                actions.append(EndDoorAction())
-            if getattr(room.quest, 'sing', None) == 'ImmortalAltar':
-                actions.append(ImmortalAltarAction())
+            if room.quest:
+                actions.append(room.quest.get_action()())
         return actions + room_doors

@@ -20,7 +20,7 @@ def game_state_test():
 def endgame_quest(game_state_test):
     game_states = game_state_test
     id_ = str(uuid.uuid4())
-    test_ques = QuestObject('test', id_)
+    test_ques = QuestObject(EndDoorAction(), id_)
     test_key = Key(id_)
     game_states.curr_room.quest = test_ques
     game_states.player.back_pack = [test_key]

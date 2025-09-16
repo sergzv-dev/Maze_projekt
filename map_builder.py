@@ -49,8 +49,8 @@ class WorldBuilder:
     @staticmethod
     def build_rooms_dict(x_line, y_line):
         rooms = dict()
-        for x in range(1, x_line):
-            for y in range(1, y_line):
+        for x in range(1, x_line+1):
+            for y in range(1, y_line+1):
                 rooms[(x,y)] = Room((x,y))
         return rooms
 
