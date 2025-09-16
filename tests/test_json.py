@@ -123,7 +123,9 @@ def test_room2():
 def test_world():
     from map_builder import World, WorldBuilder
     from quests import MainQuest, ImmortalAmuletQuest
-    world = WorldBuilder.build(10, 10, quests = [MainQuest, ImmortalAmuletQuest])
+    quests = [MainQuest, ImmortalAmuletQuest]
+    world_builder = WorldBuilder().add_rooms(10, 10).add_monsters().add_loot().add_quests(quests=quests)
+    world = world_builder.build()
     json_test(World, world)
 
 
@@ -136,7 +138,9 @@ def test_game_state():
 
     master = UI()
     player = Player('test')
-    world = WorldBuilder.build(10, 10, quests = [MainQuest, ImmortalAmuletQuest])
+    quests = [MainQuest, ImmortalAmuletQuest]
+    world_builder = WorldBuilder().add_rooms(10, 10).add_monsters().add_loot().add_quests(quests=quests)
+    world = world_builder.build()
     curr_room = world.get_room('A1')
     game_state = GameState(master, world, player, curr_room)
 
