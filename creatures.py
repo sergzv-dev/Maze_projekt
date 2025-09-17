@@ -11,15 +11,15 @@ class Creature:
     def __init__(self, *, name = None, attack = None, max_attack = None, shield = None, max_shield = None, hp = None,
                  max_hp = None, agility = None, max_agility = None, loot = None
                  ):
-        self.name = name or self.DEFAULTS.get('name')
-        self.attack = attack or self.DEFAULTS.get('attack')
-        self.max_attack = max_attack or self.DEFAULTS.get('max_attack')
-        self.shield = shield or self.DEFAULTS.get('shield')
-        self.max_shield = max_shield or self.DEFAULTS.get('max_shield')
-        self.hp = hp or self.DEFAULTS.get('hp')
-        self.max_hp = max_hp or self.DEFAULTS.get('max_hp')
-        self.agility = agility or self.DEFAULTS.get('agility')
-        self.max_agility = max_agility or self.DEFAULTS.get('max_agility')
+        self.name = name if name is not None else self.DEFAULTS.get('name')
+        self.attack = attack if attack is not None else self.DEFAULTS.get('attack')
+        self.max_attack = max_attack if max_attack is not None else self.DEFAULTS.get('max_attack')
+        self.shield = shield if shield is not None else self.DEFAULTS.get('shield')
+        self.max_shield = max_shield if max_shield is not None else self.DEFAULTS.get('max_shield')
+        self.hp = hp if hp is not None else self.DEFAULTS.get('hp')
+        self.max_hp = max_hp if max_hp is not None else self.DEFAULTS.get('max_hp')
+        self.agility = agility if agility is not None else self.DEFAULTS.get('agility')
+        self.max_agility = max_agility if max_agility is not None else self.DEFAULTS.get('max_agility')
         self.back_pack = ItemContainer()
         self.death_marker = False
         self.after_death_act = None
@@ -32,7 +32,7 @@ class Creature:
         Creature._registry[cls.__name__] = cls
 
         combined = {}
-        for base in reversed(cls.__mro__[1:]):
+        for base in reversed(cls.__mro__):
             if hasattr(base, 'DEFAULTS'):
                 combined.update(base.DEFAULTS)
         cls.DEFAULTS = combined
