@@ -4,30 +4,38 @@ import random
 from item_container import ItemContainer
 
 class Creature:
-    DEFAULTS = dict()
+    DEFAULTS = dict(name = 'creature', attack = 1, max_attack = 999, shield = 0, max_shield = 999, hp = 10,
+                 max_hp = 999, agility = 0, max_agility = 999)
     _registry = dict()
 
-    def __init__(self, *, name = 'creature', **kwargs):
+    def __init__(self, *, name = None, attack = None, max_attack = None, shield = None, max_shield = None, hp = None,
+                 max_hp = None, agility = None, max_agility = None, loot = None
+                 ):
         self.name = name or self.DEFAULTS.get('name')
-        self.attack = kwargs.get('attack', 1)
-        self.max_attack = kwargs.get('max_attack', 999)
-        self.shield = kwargs.get('shield', 0)
-        self.max_shield = kwargs.get('max_shield', 999)
-        self.hp = kwargs.get('hp', 10)
-        self.max_hp = kwargs.get('max_hp', 999)
-        self.agility = kwargs.get('agility', 0)
-        self.max_agility = kwargs.get('max_agility', 999)
+        self.attack = attack or self.DEFAULTS.get('attack')
+        self.max_attack = max_attack or self.DEFAULTS.get('max_attack')
+        self.shield = shield or self.DEFAULTS.get('shield')
+        self.max_shield = max_shield or self.DEFAULTS.get('max_shield')
+        self.hp = hp or self.DEFAULTS.get('hp')
+        self.max_hp = max_hp or self.DEFAULTS.get('max_hp')
+        self.agility = agility or self.DEFAULTS.get('agility')
+        self.max_agility = max_agility or self.DEFAULTS.get('max_agility')
         self.back_pack = ItemContainer()
         self.death_marker = False
         self.after_death_act = None
         self.fight_marker = False
         self.open_bp = False
-        loot = kwargs.get('loot', None)
         if loot:
             self.back_pack.append(loot)
 
     def __init_subclass__(cls, **kwargs):
         Creature._registry[cls.__name__] = cls
+
+        combined = {}
+        for base in reversed(cls.__mro__[1:]):
+            if hasattr(base, 'DEFAULTS'):
+                combined.update(base.DEFAULTS)
+        cls.DEFAULTS = combined
 
     def heal_hp(self, value):
         self.hp = min(self.max_hp, self.hp + value)
@@ -93,10 +101,6 @@ class Player(Creature):
                     agility = 5, max_agility = 40
                     )
 
-    def __init__(self, **kwargs):
-        params = {**self.DEFAULTS, **kwargs}
-        super().__init__(**params)
-
     def death_chek(self, game_state):
         last_chance_list = []
         if self.hp < 1:
@@ -108,10 +112,6 @@ class Player(Creature):
 
 class Monster(Creature):
     DEFAULTS = dict()
-
-    def __init__(self, **kwargs):
-        params = {**self.DEFAULTS, **kwargs}
-        super().__init__(**params)
 
     def death_chek(self, game_state):
         ui = game_state.UI
