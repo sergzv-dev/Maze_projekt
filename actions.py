@@ -239,5 +239,5 @@ class ActionProvider():
             if room.loot:
                 actions.append(GetItem())
             if room.quest:
-                actions.append(room.quest.get_action()())
+                actions.append(room.quest.get_action())
         return actions + room_doors

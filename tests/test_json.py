@@ -38,7 +38,7 @@ def take_quest():
     import uuid
     quest_action = EndDoorAction
     id_ = str(uuid.uuid4())
-    return QuestObject(quest_action(), id_)
+    return QuestObject(quest_action, id_)
 
 def take_monster():
     import random

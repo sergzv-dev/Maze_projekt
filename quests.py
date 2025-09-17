@@ -14,7 +14,7 @@ class MainQuest(Quest):
         rooms_dict = world.rooms_dict
         id_ = str(uuid.uuid4())
         end_g_key = Key(id_=id_)
-        end_door = QuestObject(EndDoorAction(), id_)
+        end_door = QuestObject(EndDoorAction, id_)
         end_room = random.choice([room for room in rooms_dict.values() if room.quest is None])
         end_room.quest = end_door
         key_room = random.choice(list(rooms_dict.values()))
@@ -29,7 +29,7 @@ class ImmortalAmuletQuest(Quest):
         rooms_dict = world.rooms_dict
         id_ = str(uuid.uuid4())
         amulet = ImmortalAmulet(id_=id_)
-        altar = QuestObject(ImmortalAltarAction(), id_)
+        altar = QuestObject(ImmortalAltarAction, id_)
         altar_room = random.choice([room for room in rooms_dict.values() if room.quest is None])
         altar_room.quest = altar
         amulet_room = random.choice(list(rooms_dict.values()))
@@ -38,7 +38,7 @@ class ImmortalAmuletQuest(Quest):
 
 class QuestObject():
     def __init__(self, quest_action, id_):
-        self.quest_action = quest_action.__class__.__name__
+        self.quest_action = quest_action.__name__
         self.id_ = id_
 
     def take_key(self, game_state):
@@ -50,13 +50,13 @@ class QuestObject():
                     return key
 
     def get_action(self) -> 'Action':
-        return Action.take_class_from_reg(self.quest_action)
+        return Action.take_class_from_reg(self.quest_action)()
 
     def to_json(self):
         return self.__dict__.copy()
 
     @classmethod
     def from_json(cls, data):
-        quest_action = Action.take_class_from_reg(data['quest_action'])()
+        quest_action = Action.take_class_from_reg(data['quest_action'])
         id_ = data['id_']
         return cls(quest_action, id_)

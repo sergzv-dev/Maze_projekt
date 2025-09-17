@@ -7,7 +7,7 @@ class Creature:
     DEFAULTS = dict()
     _registry = dict()
 
-    def __init__(self, *args, name = 'creature', **kwargs):
+    def __init__(self, *, name = 'creature', **kwargs):
         self.name = name or self.DEFAULTS.get('name')
         self.attack = kwargs.get('attack', 1)
         self.max_attack = kwargs.get('max_attack', 999)
@@ -93,9 +93,9 @@ class Player(Creature):
                     agility = 5, max_agility = 40
                     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs):
         params = {**self.DEFAULTS, **kwargs}
-        super().__init__(*args, **params)
+        super().__init__(**params)
 
     def death_chek(self, game_state):
         last_chance_list = []
@@ -109,9 +109,9 @@ class Player(Creature):
 class Monster(Creature):
     DEFAULTS = dict()
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs):
         params = {**self.DEFAULTS, **kwargs}
-        super().__init__(*args, **params)
+        super().__init__(**params)
 
     def death_chek(self, game_state):
         ui = game_state.UI

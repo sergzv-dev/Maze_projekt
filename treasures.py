@@ -7,6 +7,7 @@ from game_endings import MissingInMase
 class Treasure(Action):
     _registry = dict()
     rarity = 1
+    mode = 'default'
 
     def __init_subclass__(cls, **kwargs):
         Treasure._registry[cls.__name__] = cls
