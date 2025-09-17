@@ -44,7 +44,7 @@ def take_monster():
     import random
     from map_builder import get_random_monster
     loot = take_treasure() if random.random() < 0.5 else None
-    return get_random_monster(loot)
+    return get_random_monster(loot=loot)
 
 def test_box():
     from boxes import LootBox
@@ -90,7 +90,7 @@ def test_item_container():
 def test_player():
     from creatures import Player
     from item_container import ItemContainer
-    obj = Player('test')
+    obj = Player(name='test')
     obj.back_pack = ItemContainer([take_treasure() for _ in range(10)])
     json_test(Player, obj)
 
@@ -146,7 +146,7 @@ def test_game_state():
     from quests import MainQuest, ImmortalAmuletQuest
 
     master = UI()
-    player = Player('test')
+    player = Player(name='test')
     quests = [MainQuest, ImmortalAmuletQuest]
     world_builder = WorldBuilder().add_rooms(10, 10).add_monsters().add_loot().add_quests(quests=quests)
     world = world_builder.build()

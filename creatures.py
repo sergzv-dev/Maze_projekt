@@ -4,8 +4,11 @@ import random
 from item_container import ItemContainer
 
 class Creature:
-    def __init__(self, *args, **kwargs):
-        self.name = kwargs.get('name', 'creature')
+    DEFAULTS = dict()
+    _registry = dict()
+
+    def __init__(self, *args, name = 'creature', **kwargs):
+        self.name = name or self.DEFAULTS.get('name')
         self.attack = kwargs.get('attack', 1)
         self.max_attack = kwargs.get('max_attack', 999)
         self.shield = kwargs.get('shield', 0)
@@ -17,6 +20,14 @@ class Creature:
         self.back_pack = ItemContainer()
         self.death_marker = False
         self.after_death_act = None
+        self.fight_marker = False
+        self.open_bp = False
+        loot = kwargs.get('loot', None)
+        if loot:
+            self.back_pack.append(loot)
+
+    def __init_subclass__(cls, **kwargs):
+        Creature._registry[cls.__name__] = cls
 
     def heal_hp(self, value):
         self.hp = min(self.max_hp, self.hp + value)
@@ -49,20 +60,42 @@ class Creature:
         data['back_pack'] = self.back_pack.to_json()
         if self.after_death_act is not None:
             data['after_death_act'] = self.after_death_act.to_json()
+        data.update({'cls': self.__class__.__name__})
         return data
+
+    @classmethod
+    def from_json(cls, data):
+        class_name = data.pop('cls')
+        cls_ = Creature._registry[class_name]
+
+        bp_data = data.pop('back_pack')
+        back_pack = ItemContainer.from_json(bp_data)
+        fight_marker = data.pop('fight_marker')
+        open_bp = data.pop('open_bp')
+        death_marker = data.pop('death_marker')
+        ada_sign = data.pop('after_death_act')
+        after_death_act = None
+        if ada_sign is not None:
+            after_death_act = AfterDeathAction.from_json(ada_sign)
+
+        creature = cls_(**data)
+
+        creature.back_pack = back_pack
+        creature.fight_marker = fight_marker
+        creature.open_bp = open_bp
+        creature.death_marker = death_marker
+        creature.after_death_act = after_death_act
+        return creature
+
 
 class Player(Creature):
     DEFAULTS = dict(attack = 10, max_attack = 100, shield = 10, max_shield = 50, hp = 100, max_hp = 100,
                     agility = 5, max_agility = 40
                     )
 
-    def __init__(self, name, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         params = {**self.DEFAULTS, **kwargs}
         super().__init__(*args, **params)
-        self.name = name
-        self.fight_marker = False
-        self.open_bp = False
-
 
     def death_chek(self, game_state):
         last_chance_list = []
@@ -73,36 +106,12 @@ class Player(Creature):
             last_chance_list[0].last_chance(game_state)
 
 
-    @classmethod
-    def from_json(cls, data):
-        name = data.pop('name')
-        bp_data = data.pop('back_pack')
-        back_pack = ItemContainer.from_json(bp_data)
-        fight_marker = data.pop('fight_marker')
-        open_bp = data.pop('open_bp')
-        death_marker = data.pop('death_marker')
-
-        player = cls(name, **data)
-
-        player.back_pack = back_pack
-        player.fight_marker = fight_marker
-        player.open_bp = open_bp
-        player.death_marker = death_marker
-        return player
-
-
 class Monster(Creature):
     DEFAULTS = dict()
-    _registry = dict()
 
-    def __init__(self, loot = None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         params = {**self.DEFAULTS, **kwargs}
         super().__init__(*args, **params)
-        if loot is not None:
-            self.back_pack.append(loot)
-
-    def __init_subclass__(cls, **kwargs):
-        Monster._registry[cls.__name__] = cls
 
     def death_chek(self, game_state):
         ui = game_state.UI
@@ -120,31 +129,6 @@ class Monster(Creature):
 
     def __repr__(self):
         return f'{self.name}'
-
-    def to_json(self):
-        data = super().to_json()
-        data.update({'cls': self.__class__.__name__})
-        return data
-
-    @classmethod
-    def from_json(cls, data):
-        class_name = data.pop('cls')
-        cls_ = cls._registry[class_name]
-
-        bp_data = data.pop('back_pack')
-        back_pack = ItemContainer.from_json(bp_data)
-        death_marker = data.pop('death_marker')
-        ada_sign = data.pop('after_death_act')
-        after_death_act = None
-        if ada_sign is not None:
-            after_death_act = AfterDeathAction.from_json(ada_sign)
-
-        monster = cls_(**data)
-
-        monster.back_pack = back_pack
-        monster.death_marker = death_marker
-        monster.after_death_act = after_death_act
-        return monster
 
 class Soldier(Monster):
     DEFAULTS = dict(name = 'Soldier', attack = 7, shield = 10, hp = 50, agility = 5)

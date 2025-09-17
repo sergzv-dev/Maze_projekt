@@ -113,7 +113,7 @@ def get_random_monster(loot = None):
     creature = random.choice([Soldier, Goblin, Mage, Knight, Mimic])
     strong = random.choice([undead, beastly, demonic, frozen, cursed])
     super_m = random.choice([champion, flaming, furious])
-    monster = creature(loot)
+    monster = creature(loot = loot)
     if random.random() < 0.33:
         monster = strong(monster)
         if random.random() < 0.2:

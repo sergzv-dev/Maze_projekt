@@ -12,7 +12,7 @@ from quests import MainQuest, ImmortalAmuletQuest
 def game():
     master = UI()
     name = master.ask("What is your name? ")
-    player = Player(name)
+    player = Player(name=name)
     quests = [MainQuest, ImmortalAmuletQuest]
     world_builder = WorldBuilder().add_rooms(10, 10).add_monsters().add_loot().add_quests(quests = quests)
     world = world_builder.build()
