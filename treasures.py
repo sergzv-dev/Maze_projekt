@@ -12,8 +12,8 @@ class Treasure(Action):
     def __init_subclass__(cls, **kwargs):
         Treasure._registry[cls.__name__] = cls
 
-    def to_json(self) -> dict:
-        return {'cls': self.__class__.__name__, **self.__dict__}
+    # def to_json(self) -> dict:
+    #     return {'cls': self.__class__.__name__, **self.__dict__}
 
     @classmethod
     def from_json(cls, data: dict) -> 'Treasure':

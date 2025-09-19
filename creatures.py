@@ -2,8 +2,9 @@
 
 import random
 from item_container import ItemContainer
+from my_object import MyObject
 
-class Creature:
+class Creature(MyObject):
     DEFAULTS = dict(name = 'creature', attack = 1, max_attack = 999, shield = 0, max_shield = 999, hp = 10,
                  max_hp = 999, agility = 0, max_agility = 999)
     _registry = dict()
@@ -63,13 +64,13 @@ class Creature:
     def death_chek(self, game_state):
         pass
 
-    def to_json(self):
-        data = self.__dict__.copy()
-        data['back_pack'] = self.back_pack.to_json()
-        if self.after_death_act is not None:
-            data['after_death_act'] = self.after_death_act.to_json()
-        data.update({'cls': self.__class__.__name__})
-        return data
+    # def to_json(self):
+    #     data = self.__dict__.copy()
+    #     data['back_pack'] = self.back_pack.to_json()
+    #     if self.after_death_act is not None:
+    #         data['after_death_act'] = self.after_death_act.to_json()
+    #     data.update({'cls': self.__class__.__name__})
+    #     return data
 
     @classmethod
     def from_json(cls, data):
@@ -216,14 +217,14 @@ def furious(st_monster):
     st_monster.agility = st_monster.agility
     return st_monster
 
-class AfterDeathAction:
+class AfterDeathAction(MyObject):
     _registry = dict()
 
     def __init_subclass__(cls, **kwargs):
         AfterDeathAction._registry[cls.__name__] = cls
 
-    def to_json(self) -> dict:
-        return {'cls': self.__class__.__name__, **self.__dict__}
+    # def to_json(self) -> dict:
+    #     return {'cls': self.__class__.__name__, **self.__dict__}
 
     @classmethod
     def from_json(cls, data: dict) -> 'AfterDeathAction':

@@ -2,8 +2,9 @@
 
 from game_endings import IngloriousDeath, HappyEnd
 import random
+from my_object import MyObject
 
-class Action():
+class Action(MyObject):
     _registry = dict()
 
     def execute(self, game_state):

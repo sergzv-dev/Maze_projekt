@@ -3,6 +3,7 @@ from boxes import LootBox
 from actions import Action, EndDoorAction, ImmortalAltarAction
 import random
 import uuid
+from my_object import MyObject
 
 
 class Quest():
@@ -36,7 +37,7 @@ class ImmortalAmuletQuest(Quest):
         amulet_room.monster = get_random_monster(amulet)
         return world
 
-class QuestObject():
+class QuestObject(MyObject):
     def __init__(self, quest_action, id_):
         self.quest_action = quest_action.__name__
         self.id_ = id_
@@ -52,8 +53,8 @@ class QuestObject():
     def get_action(self) -> 'Action':
         return Action.take_class_from_reg(self.quest_action)()
 
-    def to_json(self):
-        return self.__dict__.copy()
+    # def to_json(self):
+    #     return self.__dict__.copy()
 
     @classmethod
     def from_json(cls, data):
