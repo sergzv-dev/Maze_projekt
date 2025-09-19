@@ -52,6 +52,7 @@ class WorldBuilder:
         return self
 
     def build(self) -> 'World':
+        if not getattr(self, '_add_rooms_params', None): raise AttributeError('You must build rooms')
         rooms_dict = self._build_rooms_dict(**self._add_rooms_params)
         rooms_dict = self._doors_builder(rooms_dict)
         rooms_dict = self._add_monster(rooms_dict, **self._add_monsters_params)
@@ -64,6 +65,7 @@ class WorldBuilder:
 
     @staticmethod
     def _build_rooms_dict(size_x, size_y):
+        if size_x * size_y < 4: raise ValueError('The world must contain 4 or more rooms')
         rooms = dict()
         for x in range(1, size_x+1):
             for y in range(1, size_y+1):
