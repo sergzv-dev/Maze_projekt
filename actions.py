@@ -1,8 +1,8 @@
 ''' Module contains actions for the game'''
 
-from game_endings import IngloriousDeath, HappyEnd
-import random
+from game_endings import HappyEnd
 from my_object import MyObject
+from fight_condition import FightCondition
 
 class Action(MyObject):
     _registry = dict()
@@ -53,21 +53,18 @@ class SearchAction(Action):
 
 
 class FightAction(Action):
+    def __init__(self, game_state):
+        self.fight_condition = FightCondition(game_state)
+
     def execute(self, game_state):
         player = game_state.player
         player.fight_marker = True
-        monster = game_state.curr_room.monster
-        monster.take_damage(player.attack, game_state)
-        if monster.death_marker:
-            return game_state
-        if not monster.death_marker:
-            player.take_damage(monster.attack, game_state)
-        if player.death_marker:
-            return IngloriousDeath(game_state)
+        game_state.fight_action = self.fight_condition
+        self.fight_condition.start_fight()
         return game_state
 
     def __repr__(self):
-        return 'Fight to the monster!!'
+        return self.fight_condition
 
 
 class GetItem(Action):
@@ -114,15 +111,6 @@ class ShowSpecs(Action):
     def __repr__(self):
         return 'Show your\'s specs'
 
-class ShowMonstersSpecs(Action):
-    def execute(self, game_state):
-        mon = game_state.curr_room.monster
-        specs = f'name: {mon.name}\nHP: {mon.hp}\nattack: {mon.attack}\nshield: {mon.shield}\nagility: {mon.agility}\n'
-        game_state.UI.say(specs)
-        return game_state
-
-    def __repr__(self):
-        return 'Show monsters specs'
 
 class OpenBox(Action):
     def execute(self, game_state):
@@ -141,19 +129,6 @@ class OpenBox(Action):
     def __repr__(self):
         return 'Open the box'
 
-class EscapeAction(Action):
-    def execute(self, game_state):
-        ui = game_state.UI
-        ui.say(f'you try to sneak away')
-        player = game_state.player
-        monster = game_state.curr_room.monster
-        if random.randint(1, 2) == 1:
-            player.take_damage(monster.attack, game_state, death = False)
-        player.fight_marker = False
-        return game_state
-
-    def __repr__(self):
-        return 'Escape the fight'
 
 class SaveGame(Action):
     def execute(self, game_state):
@@ -221,7 +196,8 @@ class ActionProvider():
         if player.open_bp:
             return bp_actions + player.back_pack
         if player.fight_marker:
-            return [FightAction(), EscapeAction(), ShowMonstersSpecs()] + player_act
+            fight_act = game_state.fight_action.get_action()
+            return fight_act + player_act
         return player_act + ActionProvider.room_act_gen(game_state) + opt_actions
 
     @staticmethod
@@ -230,10 +206,10 @@ class ActionProvider():
         rooms_dict = game_state.world.rooms_dict
         room = game_state.curr_room
         room_doors = [MoveAction(rooms_dict[door]) for door in room.doors]
-        if not room.room_searched:
+        if room.monster:
+            actions = [FightAction(game_state)]
+        elif not room.room_searched:
             actions = [SearchAction()]
-        elif room.monster:
-            actions = [FightAction()]
         else:
             if room.box:
                 actions.append(OpenBox())

@@ -7,6 +7,7 @@ class GameState():
         self.player = player
         self.world = world
         self.curr_room = curr_room
+        self.fight_action = None
 
     def save_game(self, file_link = 'save_data.json'):
         with open(file_link, 'w') as f:
