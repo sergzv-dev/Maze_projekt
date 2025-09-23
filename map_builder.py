@@ -36,6 +36,7 @@ class World:
 class WorldBuilder:
 
     def add_rooms(self, size_x: int, size_y: int) -> 'WorldBuilder':
+        if size_x * size_y < 4: raise ValueError('The world must contain 4 or more rooms')
         self._add_rooms_params = dict(size_x = size_x, size_y = size_y)
         return self
 
@@ -65,7 +66,6 @@ class WorldBuilder:
 
     @staticmethod
     def _build_rooms_dict(size_x, size_y):
-        if size_x * size_y < 4: raise ValueError('The world must contain 4 or more rooms')
         rooms = dict()
         for x in range(1, size_x+1):
             for y in range(1, size_y+1):
