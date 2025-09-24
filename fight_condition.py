@@ -1,5 +1,6 @@
 from game_endings import IngloriousDeath
 import random
+from abstractions import Action
 
 class FightCondition:
     def __init__(self, game_state):
@@ -7,6 +8,7 @@ class FightCondition:
         self.team1 = self.state.player
         self.team2 = self.state.curr_room.monster
         self.repr = None
+        self.target = None
 
     def fight_execute(self, game_state):
         player = game_state.player
@@ -28,10 +30,25 @@ class FightCondition:
         return self.repr
 
     def get_action(self):
-        return [ShowMonstersSpecs(), EscapeAction()]
+        actions =[]
+        self.target_chek()
+        actions += [ShowMonstersSpecs(), EscapeAction()]
+        return actions
+
+    def target_chek(self):
+        if self.target not in self.state.monster: self.target = None
 
 
-class ShowMonstersSpecs():
+class ChooseTarget(Action):
+    def execute(self, game_state):
+        ui = game_state.UI
+        target_list = game_state.fight_action.team2
+        ui.say('choose target monster..')
+        target = ui.choose(target_list)
+        game_state.fight_action.target = target
+        return game_state
+
+class ShowMonstersSpecs(Action):
     def execute(self, game_state):
         mon = game_state.curr_room.monster
         specs = f'name: {mon.name}\nHP: {mon.hp}\nattack: {mon.attack}\nshield: {mon.shield}\nagility: {mon.agility}\n'
@@ -41,7 +58,7 @@ class ShowMonstersSpecs():
     def __repr__(self):
         return 'Show monsters specs'
 
-class EscapeAction():
+class EscapeAction(Action):
     def execute(self, game_state):
         ui = game_state.UI
         ui.say(f'you try to sneak away')
