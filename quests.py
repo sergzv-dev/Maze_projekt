@@ -1,9 +1,9 @@
 from treasures import QuestItem, Key, ImmortalAmulet
 from boxes import LootBox
-from actions import Action, EndDoorAction, ImmortalAltarAction
+from actions import EndDoorAction, ImmortalAltarAction
 import random
 import uuid
-from my_object import MyObject
+from abstractions import MyObject, Action
 
 
 class Quest():
@@ -26,7 +26,6 @@ class ImmortalAmuletQuest(Quest):
     @staticmethod
     def add_quest(world):
         from map_builder import get_random_monster
-
         rooms_dict = world.rooms_dict
         id_ = str(uuid.uuid4())
         amulet = ImmortalAmulet(id_=id_)
@@ -52,9 +51,6 @@ class QuestObject(MyObject):
 
     def get_action(self) -> 'Action':
         return Action.take_class_from_reg(self.quest_action)()
-
-    # def to_json(self):
-    #     return self.__dict__.copy()
 
     @classmethod
     def from_json(cls, data):

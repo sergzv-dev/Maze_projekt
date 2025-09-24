@@ -1,6 +1,9 @@
 ''' Module contains room class and name_convert function'''
 from item_container import ItemContainer
-from my_object import MyObject
+from abstractions import MyObject
+from creatures import Monster
+from quests import QuestObject
+from boxes import LootBox
 
 class Room(MyObject):
     def __init__(self, name: tuple):
@@ -15,23 +18,8 @@ class Room(MyObject):
     def __repr__(self):
         return name_convert(self.name)
 
-    # def to_json(self):
-    #     data = self.__dict__.copy()
-    #     if self.monster:
-    #         data['monster'] = self.monster.to_json()
-    #     if self.box:
-    #         data['box'] = self.box.to_json()
-    #     if self.quest:
-    #         data['quest'] = self.quest.to_json()
-    #     data['loot'] = self.loot.to_json()
-    #     return data
-
     @classmethod
     def from_json(cls, room_data):
-        from creatures import Monster
-        from quests import QuestObject
-        from boxes import LootBox
-
         name = tuple(room_data['name'])
         doors = [tuple(door) for door in room_data['doors']]
         monster = room_data['monster']

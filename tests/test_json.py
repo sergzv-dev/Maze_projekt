@@ -13,7 +13,7 @@ def json_test(class_, obj):
     return new_obj
 
 def json_test_treasure(obj):
-    from treasures import Treasure
+    from abstractions import Treasure
     print(f'{obj.__dict__}')
     json_obj = obj.to_json()
     json_data = json.dumps(json_obj)

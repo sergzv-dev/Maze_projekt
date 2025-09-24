@@ -8,6 +8,7 @@ from treasures import (LittleMedicine, MediumMedicine, LargeMedicine, ImproveAtt
 from creatures import (Soldier, Goblin, Mage, Knight, Mimic, undead, beastly, demonic, frozen, cursed,
                        champion, flaming, furious)
 from room import Room, name_convert
+from boxes import LootBox
 
 class World:
     def __init__(self, rooms_dict=None):
@@ -92,7 +93,6 @@ class WorldBuilder:
 
     @staticmethod
     def _add_loot(rooms_dict, *, box_probability=0.33):
-        from boxes import LootBox
         for room in rooms_dict.values():
             room.box = LootBox(get_random_treasure(bomb_mode=True)) if random.random() < box_probability else None
         return rooms_dict

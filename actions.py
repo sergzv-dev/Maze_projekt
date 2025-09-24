@@ -1,21 +1,8 @@
 ''' Module contains actions for the game'''
 
 from game_endings import HappyEnd
-from my_object import MyObject
+from abstractions import Action, QuestAction
 from fight_condition import FightCondition
-
-class Action(MyObject):
-    _registry = dict()
-
-    def execute(self, game_state):
-        pass
-
-    def __init_subclass__(cls, **kwargs):
-        Action._registry[cls.__name__] = cls
-
-    @classmethod
-    def take_class_from_reg(cls, class_name):
-        return cls._registry[class_name]
 
 class MoveAction(Action):
     def __init__(self, target_room):
@@ -147,8 +134,6 @@ class LoadGame(Action):
     def __repr__(self):
         return 'Load game'
 
-class QuestAction(Action):
-    pass
 
 class EndDoorAction(QuestAction):
     def execute(self, game_state):
