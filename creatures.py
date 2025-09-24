@@ -2,7 +2,7 @@
 
 import random
 from item_container import ItemContainer
-from my_object import MyObject
+from abstractions import MyObject
 
 class Creature(MyObject):
     DEFAULTS = dict(name = 'creature', attack = 1, max_attack = 999, shield = 0, max_shield = 999, hp = 10,
@@ -63,14 +63,6 @@ class Creature(MyObject):
 
     def death_chek(self, game_state):
         pass
-
-    # def to_json(self):
-    #     data = self.__dict__.copy()
-    #     data['back_pack'] = self.back_pack.to_json()
-    #     if self.after_death_act is not None:
-    #         data['after_death_act'] = self.after_death_act.to_json()
-    #     data.update({'cls': self.__class__.__name__})
-    #     return data
 
     @classmethod
     def from_json(cls, data):
@@ -222,9 +214,6 @@ class AfterDeathAction(MyObject):
 
     def __init_subclass__(cls, **kwargs):
         AfterDeathAction._registry[cls.__name__] = cls
-
-    # def to_json(self) -> dict:
-    #     return {'cls': self.__class__.__name__, **self.__dict__}
 
     @classmethod
     def from_json(cls, data: dict) -> 'AfterDeathAction':

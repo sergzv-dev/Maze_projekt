@@ -1,5 +1,7 @@
 ''' Module contains states of current game'''
 import json
+from creatures import Player
+from map_builder import World
 
 class GameState():
     def __init__(self, master, world, player, curr_room):
@@ -29,9 +31,6 @@ class GameState():
 
     @classmethod
     def from_json(cls, json_data, ui) -> 'GameState':
-        from creatures import Player
-        from map_builder import World
-
         data = json.loads(json_data)
         master = ui
         player = Player.from_json(data['player'])
