@@ -4,6 +4,7 @@ from actions import EndDoorAction, ImmortalAltarAction
 import random
 import uuid
 from abstractions import MyObject, Action
+from creatures import get_random_monster
 
 
 class Quest():
@@ -25,7 +26,6 @@ class MainQuest(Quest):
 class ImmortalAmuletQuest(Quest):
     @staticmethod
     def add_quest(world):
-        from map_builder import get_random_monster
         rooms_dict = world.rooms_dict
         id_ = str(uuid.uuid4())
         amulet = ImmortalAmulet(id_=id_)

@@ -32,6 +32,8 @@ class FightCondition:
     def get_action(self):
         actions =[]
         self.target_chek()
+        if not self.target:
+            actions.append(ChooseTarget())
         actions += [ShowMonstersSpecs(), EscapeAction()]
         return actions
 
@@ -39,16 +41,22 @@ class FightCondition:
         if self.target not in self.state.monster: self.target = None
 
 
-class ChooseTarget(Action):
+class FightAction(Action):
+    pass
+
+class ChooseTarget(FightAction):
     def execute(self, game_state):
         ui = game_state.UI
         target_list = game_state.fight_action.team2
-        ui.say('choose target monster..')
+        ui.say('which monster do you want to attack?')
         target = ui.choose(target_list)
         game_state.fight_action.target = target
         return game_state
 
-class ShowMonstersSpecs(Action):
+    def __repr__(self):
+        return 'choose target monster'
+
+class ShowMonstersSpecs(FightAction):
     def execute(self, game_state):
         mon = game_state.curr_room.monster
         specs = f'name: {mon.name}\nHP: {mon.hp}\nattack: {mon.attack}\nshield: {mon.shield}\nagility: {mon.agility}\n'
@@ -58,7 +66,7 @@ class ShowMonstersSpecs(Action):
     def __repr__(self):
         return 'Show monsters specs'
 
-class EscapeAction(Action):
+class EscapeAction(FightAction):
     def execute(self, game_state):
         ui = game_state.UI
         ui.say(f'you try to sneak away')

@@ -180,3 +180,16 @@ class ImmortalAmulet(QuestItem):
 
     def __init__(self, id_, name = 'Immortal amulet'):
         super().__init__(id_ = id_, name = name)
+
+
+def get_random_treasure(bomb_mode=False):
+    treasures_list = [LittleMedicine, MediumMedicine, LargeMedicine, ImproveAttack,
+                      ImproveShield, FakePowerBook, SacrificeAmulet, ResilienceMutagen,
+                      PhoenixAmulet, TrueBookOfPower
+                      ]
+    if bomb_mode: treasures_list += [Bomb]
+    treas_choose = []
+    for treas_clss_obj in treasures_list:
+        treas_item = treas_clss_obj()
+        treas_choose += [treas_item] * treas_item.rarity
+    return random.choice(treas_choose)

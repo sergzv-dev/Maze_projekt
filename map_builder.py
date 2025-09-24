@@ -1,12 +1,8 @@
 ''' Module generate and fills the map in the beginning'''
 
 import random
-from treasures import (LittleMedicine, MediumMedicine, LargeMedicine, ImproveAttack,
-                       ImproveShield, FakePowerBook, SacrificeAmulet, ResilienceMutagen, Bomb,
-                       PhoenixAmulet, TrueBookOfPower
-                       )
-from creatures import (Soldier, Goblin, Mage, Knight, Mimic, undead, beastly, demonic, frozen, cursed,
-                       champion, flaming, furious)
+from treasures import get_random_treasure
+from creatures import get_random_monster
 from room import Room, name_convert
 from boxes import LootBox
 
@@ -96,28 +92,3 @@ class WorldBuilder:
         for room in rooms_dict.values():
             room.box = LootBox(get_random_treasure(bomb_mode=True)) if random.random() < box_probability else None
         return rooms_dict
-
-
-def get_random_treasure(bomb_mode=False):
-    treasures_list = [LittleMedicine, MediumMedicine, LargeMedicine, ImproveAttack,
-                      ImproveShield, FakePowerBook, SacrificeAmulet, ResilienceMutagen,
-                      PhoenixAmulet, TrueBookOfPower
-                      ]
-    if bomb_mode: treasures_list += [Bomb]
-    treas_choose = []
-    for treas_clss_obj in treasures_list:
-        treas_item = treas_clss_obj()
-        treas_choose += [treas_item] * treas_item.rarity
-    return random.choice(treas_choose)
-
-
-def get_random_monster(loot = None):
-    creature = random.choice([Soldier, Goblin, Mage, Knight, Mimic])
-    strong = random.choice([undead, beastly, demonic, frozen, cursed])
-    super_m = random.choice([champion, flaming, furious])
-    monster = creature(loot = loot)
-    if random.random() < 0.33:
-        monster = strong(monster)
-        if random.random() < 0.2:
-            monster = super_m(monster)
-    return monster

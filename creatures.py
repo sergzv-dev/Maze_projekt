@@ -230,3 +230,15 @@ class ExplosionMod(AfterDeathAction):
         game_state.UI.say('The monster blowing up in the room!!!')
         game_state.player.take_damage(self.hp, game_state, death=False)
         return game_state
+
+
+def get_random_monster(loot = None):
+    creature = random.choice([Soldier, Goblin, Mage, Knight, Mimic])
+    strong = random.choice([undead, beastly, demonic, frozen, cursed])
+    super_m = random.choice([champion, flaming, furious])
+    monster = creature(loot = loot)
+    if random.random() < 0.33:
+        monster = strong(monster)
+        if random.random() < 0.2:
+            monster = super_m(monster)
+    return monster
