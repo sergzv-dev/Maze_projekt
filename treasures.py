@@ -160,7 +160,7 @@ class TrueBookOfPower(Treasure):
         sacrifice = random.choice([item for item in player.back_pack if not isinstance(item, QuestItem)])
         player.back_pack.remove(sacrifice)
         if room.monster:
-            room.monster.take_damage(9999, game_state)
+            room.monster.clear()
         ui.say('all living things turned to dust')
         return game_state
 

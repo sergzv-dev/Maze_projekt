@@ -90,8 +90,8 @@ class Creature(MyObject):
 
 
 class Player(Creature):
-    DEFAULTS = dict(attack = 10, max_attack = 100, shield = 10, max_shield = 50, hp = 100, max_hp = 100,
-                    agility = 5, max_agility = 40
+    DEFAULTS = dict(attack = 15, max_attack = 100, shield = 20, max_shield = 50, hp = 100, max_hp = 100,
+                    agility = 10, max_agility = 40
                     )
 
     def death_chek(self, game_state):

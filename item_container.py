@@ -1,9 +1,14 @@
-from abstractions import Treasure
-
 class ItemContainer(list):
     def to_json(self) -> list[dict]:
         return [item.to_json() for item in self]
 
     @classmethod
     def from_json(cls, data):
+        from abstractions import Treasure
         return cls([Treasure.from_json(item_data) for item_data in data])
+
+class MonsterContainer(ItemContainer):
+    @classmethod
+    def from_json(cls, data):
+        from creatures import Monster
+        return cls([Monster.from_json(item_data) for item_data in data])

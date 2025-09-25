@@ -24,7 +24,10 @@ class SearchAction(Action):
         room = game_state.curr_room
         room.room_searched = True
         if room.monster:
-            ui.say(f'there is {room.monster} lurking in a dark corner')
+            message = f'{room.monster[0]}'
+            if len(room.monster) > 1:
+                message += ''.join(f' ,{monster}' for monster in room.monster[1:])
+            ui.say(f'there is {message} lurking in a dark corner')
         elif room.quest:
             if room.quest.sign == 'EndDoor':
                 ui.say('you find old dusty door')
@@ -32,7 +35,8 @@ class SearchAction(Action):
                 ui.say('many candles in the room and circle of runes in the center')
         elif room.box:
             ui.say('this is looks like an old chest!')
-        else: ui.say('the rom is empty')
+        else:
+            ui.say('the room is empty')
         return game_state
 
     def __repr__(self):

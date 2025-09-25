@@ -82,9 +82,9 @@ class WorldBuilder:
     @staticmethod
     def _add_monster(rooms_dict, *, monster_probability=0.25, loot_probability=0.33) -> dict:
         for room in rooms_dict.values():
-            if random.random() < monster_probability:
+            while random.random() < monster_probability:
                 loot = get_random_treasure() if random.random() < loot_probability else None
-                room.monster = get_random_monster(loot)
+                room.monster.append(get_random_monster(loot))
         return rooms_dict
 
     @staticmethod
