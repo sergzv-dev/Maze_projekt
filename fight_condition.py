@@ -5,10 +5,12 @@ from abstractions import Action
 class FightCondition:
     def __init__(self, game_state):
         self.state = game_state
-        self.team1 = self.state.player
+        self.team1 = [self.state.player]
+        self.target1 = None
         self.team2 = self.state.curr_room.monster
+        self.target2 = None
         self.repr = None
-        self.target = None
+
 
     def fight_execute(self, game_state):
         player = game_state.player
@@ -23,6 +25,15 @@ class FightCondition:
             return IngloriousDeath(game_state)
         return game_state
 
+    def make_queue(self):
+        setattr_fun = lambda obj: setattr(obj, 'temp_seq', random.randint(1, max(1, obj.agility)))
+        delattr_fun = lambda obj: delattr(obj, 'temp_seq')
+        sequence = [setattr_fun(creature) for creature in self.team1 + self.team2]
+        sequence = sorted(sequence, key=lambda x: x['temp_seq'], reverse=True)
+        sequence = [delattr_fun(creature) for creature in sequence]
+        return sequence
+
+
     def start_fight(self):
         return self.state
 
@@ -32,13 +43,13 @@ class FightCondition:
     def get_action(self):
         actions =[]
         self.target_chek()
-        if not self.target:
+        if not self.target1:
             actions.append(ChooseTarget())
         actions += [ShowMonstersSpecs(), EscapeAction()]
         return actions
 
     def target_chek(self):
-        if self.target not in self.state.monster: self.target = None
+        if self.target1 not in self.state.monster: self.target1 = None
 
 
 class FightAction(Action):
@@ -50,7 +61,7 @@ class ChooseTarget(FightAction):
         target_list = game_state.fight_action.team2
         ui.say('which monster do you want to attack?')
         target = ui.choose(target_list)
-        game_state.fight_action.target = target
+        game_state.fight_action.target1 = target
         return game_state
 
     def __repr__(self):
