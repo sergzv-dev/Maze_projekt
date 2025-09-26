@@ -23,12 +23,7 @@ class SearchAction(Action):
         ui = game_state.UI
         room = game_state.curr_room
         room.room_searched = True
-        if room.monster:
-            message = f'{room.monster[0]}'
-            if len(room.monster) > 1:
-                message += ''.join(f' ,{monster}' for monster in room.monster[1:])
-            ui.say(f'there is {message} lurking in a dark corner')
-        elif room.quest:
+        if room.quest:
             if room.quest.sign == 'EndDoor':
                 ui.say('you find old dusty door')
             if room.quest.sign == 'ImmortalAltar':
@@ -197,7 +192,7 @@ class ActionProvider():
         room_doors = [MoveAction(rooms_dict[door]) for door in room.doors]
         if room.monster:
             actions = [FightAction(game_state)]
-        elif not room.room_searched:
+        elif not room.room_searched and not room.monster:
             actions = [SearchAction()]
         else:
             if room.box:

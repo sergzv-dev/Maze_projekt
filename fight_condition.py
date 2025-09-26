@@ -5,11 +5,15 @@ from abstractions import Action
 class FightCondition:
     def __init__(self, game_state):
         self.state = game_state
+        self.player = game_state.player
         self.team1 = [self.state.player]
         self.target1 = None
         self.team2 = self.state.curr_room.monster
         self.target2 = None
         self.repr = None
+        self.hiding_mimic = False
+        self.temp_attrs = ['temp_seq', 'attack_boost', 'shield_boost', 'attack_debuff', 'shield_debuff']
+        self.creatures_list = self.team1 + self.team2
 
 
     def fight_execute(self, game_state):
@@ -51,6 +55,18 @@ class FightCondition:
     def target_chek(self):
         if self.target1 not in self.state.monster: self.target1 = None
 
+    def enter_fight(self):
+        for creature in self.creatures_list:
+            for attr in self.temp_attrs:
+                setattr(creature, attr, 0)
+        self.player.fight_marker = True
+
+    def exit_fight(self):
+        for creature in self.creatures_list:
+            for attr in self.temp_attrs:
+                delattr(creature, attr)
+        self.player.fight_marker = False
+
 
 class FightAction(Action):
     pass
@@ -90,3 +106,24 @@ class EscapeAction(FightAction):
 
     def __repr__(self):
         return 'Escape the fight'
+
+
+class SearchMonsterAction(FightAction):
+    def execute(self, game_state):
+        ui = game_state.UI
+        player = game_state.player
+        room = game_state.curr_room
+        fight_action = game_state.fight_action
+        room.room_searched = True
+        if len(room.monster) > 1:
+            player.fight_marker = True
+            ui.say(f'the monsters unexpectedly attacked!')
+        elif 'Mimic' in room.monster[0].__name__:
+            fight_action.hiding_mimic = True
+            ui.say('this is looks like an old chest!')
+        elif room.monster:
+            ui.say(f'there is {room.monster[0]} lurking in a dark corner')
+        return game_state
+
+    def __repr__(self):
+        return 'Search the room'
