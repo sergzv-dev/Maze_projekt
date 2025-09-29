@@ -190,10 +190,12 @@ class ActionProvider():
         rooms_dict = game_state.world.rooms_dict
         room = game_state.curr_room
         room_doors = [MoveAction(rooms_dict[door]) for door in room.doors]
-        if room.monster:
+        if len(room.monster) > 1:
             actions = [FightAction(game_state)]
-        elif not room.room_searched and not room.monster:
+        elif not room.room_searched:
             actions = [SearchAction()]
+        elif room.monster:
+            actions = [FightAction(game_state)]
         else:
             if room.box:
                 actions.append(OpenBox())

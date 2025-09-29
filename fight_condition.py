@@ -3,18 +3,28 @@ import random
 from abstractions import Action
 
 class FightCondition:
+    temp_attrs = ['temp_seq', 'attack_boost', 'shield_boost', 'attack_debuff', 'shield_debuff']
+
     def __init__(self, game_state):
+        self.state = None
+        self.player = None
+        self.team1 = None
+        self.target1 = None
+        self.team2 = None
+        self.target2 = None
+        self.hiding_mimic = False
+        self.creatures_list = None
+        self.repr = self.set_repr(game_state)
+
+    def class_initialisation(self, game_state):
         self.state = game_state
         self.player = game_state.player
         self.team1 = [self.state.player]
         self.target1 = None
         self.team2 = self.state.curr_room.monster
         self.target2 = None
-        self.repr = None
         self.hiding_mimic = False
-        self.temp_attrs = ['temp_seq', 'attack_boost', 'shield_boost', 'attack_debuff', 'shield_debuff']
         self.creatures_list = self.team1 + self.team2
-
 
     def fight_execute(self, game_state):
         player = game_state.player
@@ -37,7 +47,6 @@ class FightCondition:
         sequence = [delattr_fun(creature) for creature in sequence]
         return sequence
 
-
     def start_fight(self):
         return self.state
 
@@ -54,6 +63,16 @@ class FightCondition:
 
     def target_chek(self):
         if self.target1 not in self.state.monster: self.target1 = None
+
+    @staticmethod
+    def set_repr(game_state):
+        if len(game_state.monster) > 1:
+            res_repr = 'Search the room'
+        elif 'Mimic' in game_state.monster[0].__name__:
+            res_repr = 'Open the box'
+        else: res_repr = 'Fight to the monster!!'
+        return res_repr
+
 
     def enter_fight(self):
         for creature in self.creatures_list:
