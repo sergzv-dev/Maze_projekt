@@ -45,7 +45,7 @@ class Creature(MyObject):
         min_hp = -1
         ui = game_state.UI
         if not death and self.hp != 1: min_hp = 1
-        damage = round(value*(1- self.shield/100))
+        damage = round(value*(1- (self.shield + getattr(self, 'shield_effect', 0))/100))
         if random.randint(1, 100) <= self.agility:
             damage = 0
             ui.say(f'{self.name} dodged the attack')
