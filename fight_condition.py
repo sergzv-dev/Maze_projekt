@@ -25,6 +25,12 @@ class FightCondition:
         self.creatures_list = self.team1 + self.team2
         self.queue = cycle(self.make_queue(self.creatures_list))
 
+    def monsters_move(self):
+        while True:
+            creature = self.take_next_creature()
+            if creature == self.player: break
+            else: self.take_monster_action(creature)
+
     def fight_execute(self, game_state):
         player = game_state.player
         player.fight_marker = True
@@ -65,6 +71,9 @@ class FightCondition:
     def take_next_creature(self):
         return next(self.queue)
 
+    def take_monster_action(self, creature):
+        pass
+
     @staticmethod
     def set_repr(game_state):
         if len(game_state.monster) > 1:
@@ -95,6 +104,7 @@ class Attack(FightAction):
     def execute(self, game_state):
         player = game_state.player
         player.target.take_damage(player.attack, game_state)
+        game_state.fight_action.monsters_move()
         return game_state
 
     def __repr__(self):
@@ -105,6 +115,7 @@ class StrongAttack(FightAction):
         player = game_state.player
         player.shield_effect = -player.shield
         player.target.take_damage(player.attack*2, game_state)
+        game_state.fight_action.monsters_move()
         return game_state
 
     def __repr__(self):
@@ -115,6 +126,7 @@ class DefenseAttack(FightAction):
         player = game_state.player
         player.shield_effect = player.shield
         player.target.take_damage(player.attack/2, game_state)
+        game_state.fight_action.monsters_move()
         return game_state
 
     def __repr__(self):
