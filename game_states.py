@@ -4,12 +4,13 @@ from creatures import Player
 from map_builder import World
 
 class GameState():
-    def __init__(self, master, world, player, curr_room):
+    def __init__(self, master, world, player, curr_room, fight_service):
         self.UI = master
+        self.fight_service = fight_service
         self.player = player
         self.world = world
         self.curr_room = curr_room
-        self.fight_action = None
+        self.fight_state = None
 
     def save_game(self, file_link = 'save_data.json'):
         with open(file_link, 'w') as f:

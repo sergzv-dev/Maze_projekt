@@ -8,7 +8,7 @@ class Room(MyObject):
     def __init__(self, name: tuple):
         self.name = name
         self.doors = []
-        self.monster = MonsterContainer()
+        self.monsters = MonsterContainer()
         self.loot = ItemContainer()
         self.box = None
         self.room_searched = False
@@ -21,15 +21,15 @@ class Room(MyObject):
     def from_json(cls, room_data):
         name = tuple(room_data['name'])
         doors = [tuple(door) for door in room_data['doors']]
-        monster = room_data['monster']
+        monsters = room_data['monsters']
         loot = room_data['loot']
         box = room_data['box']
         quest = room_data['quest']
 
         room = cls(name)
         room.doors = doors
-        if monster:
-            room.monster = MonsterContainer.from_json(monster)
+        if monsters:
+            room.monsters = MonsterContainer.from_json(monsters)
         room.loot = ItemContainer.from_json(loot)
         if box:
             room.box = LootBox.from_json(box)

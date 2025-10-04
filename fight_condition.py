@@ -4,26 +4,48 @@ from itertools import cycle
 from abstractions import Action
 
 class FightCondition:
-    temp_attrs = ['temp_seq', 'shield_effect', 'target']
-
     def __init__(self, game_state):
-        self.state = None
-        self.player = None
-        self.team1 = None
-        self.team2 = None
-        self.hiding_mimic = False
-        self.creatures_list = None
-        self.queue = None
-        self.repr = self.set_repr(game_state)
-
-    def class_initialisation(self, game_state):
-        self.state = game_state
         self.player = game_state.player
-        self.team1 = [self.state.player]
-        self.team2 = self.state.curr_room.monster
-        self.hiding_mimic = False
+        self.team1 = [game_state.player]
+        self.team2 = game_state.curr_room.monsters
         self.creatures_list = self.team1 + self.team2
-        self.queue = cycle(self.make_queue(self.creatures_list))
+        self.queue = self.make_queue(self.creatures_list)
+        self.effects_dict = self.make_effects_dict(self.creatures_list)
+        self.targets_dict = self.make_targets_dict(self.creatures_list)
+
+    @staticmethod
+    def make_queue(sequence):
+        return cycle(sorted(sequence, key=lambda creature: -random.randint(1, max(1, creature.agility))))
+
+    @staticmethod
+    def make_effects_dict(sequence):
+        return {creature: UnderEffects() for creature in sequence}
+
+    @staticmethod
+    def make_targets_dict(sequence):
+        return {creature: None for creature in sequence}
+
+
+class FightService:
+    def get_action(self):
+        actions = []
+        self.target_chek()
+        if not self.player.target:
+            actions.append(ChooseTarget())
+        actions += [ShowMonstersSpecs(), EscapeAction()]
+        return actions
+
+    def target_chek(self):
+        if self.player.target not in self.state.monster: self.player.target = None
+
+    def take_next_creature(self):
+        return next(self.queue)
+
+    def take_monster_action(self, creature):
+        pass
+
+    def start_fight(self):
+        return self.state
 
     def monsters_move(self):
         while True:
@@ -44,58 +66,20 @@ class FightCondition:
             return IngloriousDeath(game_state)
         return game_state
 
-    @staticmethod
-    def make_queue(sequence):
-        setattr_fun = lambda obj: setattr(obj, 'temp_seq', random.randint(1, max(1, obj.agility)))
-        sequence = [setattr_fun(creature) for creature in sequence]
-        sequence = sorted(sequence, key=lambda x: x['temp_seq'], reverse=True)
-        return sequence
 
-    def start_fight(self):
-        return self.state
+class UnderEffects:
+    def __init__(self):
+        self.temp_shield = None
+        self.temp_agility = None
 
-    def __repr__(self):
-        return self.repr
+    def set_effects(self, *, temp_shield = None, temp_agility = None):
+        self.temp_shield = temp_shield
+        self.temp_agility = temp_agility
 
-    def get_action(self):
-        actions =[]
-        self.target_chek()
-        if not self.player.target:
-            actions.append(ChooseTarget())
-        actions += [ShowMonstersSpecs(), EscapeAction()]
-        return actions
-
-    def target_chek(self):
-        if self.player.target not in self.state.monster: self.player.target = None
-
-    def take_next_creature(self):
-        return next(self.queue)
-
-    def take_monster_action(self, creature):
-        pass
-
-    @staticmethod
-    def set_repr(game_state):
-        if len(game_state.monster) > 1:
-            res_repr = 'Search the room'
-        elif 'Mimic' in game_state.monster[0].__name__:
-            res_repr = 'Open the box'
-        else: res_repr = 'Fight to the monster!!'
-        return res_repr
-
-
-    def enter_fight(self):
-        for creature in self.creatures_list:
-            for attr in self.temp_attrs:
-                setattr(creature, attr, None)
-        self.player.fight_marker = True
-
-    def exit_fight(self):
-        for creature in self.creatures_list:
-            for attr in self.temp_attrs:
-                delattr(creature, attr)
-        self.player.fight_marker = False
-
+    def aplay_effects(self):
+        effects = self.__dict__.copy()
+        self.set_effects()
+        return effects
 
 class FightAction(Action):
     pass

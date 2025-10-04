@@ -23,7 +23,10 @@ class SearchAction(Action):
         ui = game_state.UI
         room = game_state.curr_room
         room.room_searched = True
-        if room.quest:
+        if len(room.monsters) > 1:
+            game_state.fight_state = FightCondition(game_state)
+            ui.say('monsters suddenly attack you')
+        elif room.quest:
             if room.quest.sign == 'EndDoor':
                 ui.say('you find old dusty door')
             if room.quest.sign == 'ImmortalAltar':
@@ -39,18 +42,12 @@ class SearchAction(Action):
 
 
 class FightAction(Action):
-    def __init__(self, game_state):
-        self.fight_condition = FightCondition(game_state)
-
     def execute(self, game_state):
-        player = game_state.player
-        player.fight_marker = True
-        game_state.fight_action = self.fight_condition
-        self.fight_condition.start_fight()
+        game_state.fight_state = FightCondition(game_state)
         return game_state
 
     def __repr__(self):
-        return self.fight_condition
+        return 'Fight to the monster!!'
 
 
 class GetItem(Action):
@@ -179,8 +176,8 @@ class ActionProvider():
         opt_actions = [SaveGame(), LoadGame()]
         if player.open_bp:
             return bp_actions + player.back_pack
-        if player.fight_marker:
-            fight_act = game_state.fight_action.get_action()
+        if game_state.fight_state:
+            fight_act = game_state.fight_state.get_action()
             return fight_act + player_act
         return player_act + ActionProvider.room_act_gen(game_state) + opt_actions
 
@@ -190,12 +187,10 @@ class ActionProvider():
         rooms_dict = game_state.world.rooms_dict
         room = game_state.curr_room
         room_doors = [MoveAction(rooms_dict[door]) for door in room.doors]
-        if len(room.monster) > 1:
-            actions = [FightAction(game_state)]
-        elif not room.room_searched:
+        if not room.room_searched:
             actions = [SearchAction()]
-        elif room.monster:
-            actions = [FightAction(game_state)]
+        elif room.monsters:
+            actions = [FightAction()]
         else:
             if room.box:
                 actions.append(OpenBox())

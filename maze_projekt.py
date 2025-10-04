@@ -7,17 +7,19 @@ from game_states import GameState
 from game_endings import EndGame
 from actions import ActionProvider
 from quests import MainQuest, ImmortalAmuletQuest
+from fight_condition import FightService
 
 
 def game():
     master = UI()
+    fight_service = FightService
     name = master.ask("What is your name? ")
     player = Player(name=name)
     quests = [MainQuest, ImmortalAmuletQuest]
     world_builder = WorldBuilder().add_rooms(10, 10).add_monsters().add_loot().add_quests(quests = quests)
     world = world_builder.build()
     curr_room = world.get_room('A1')
-    game_state = GameState(master, world, player, curr_room)
+    game_state = GameState(master, world, player, curr_room, fight_service)
 
     while True:
         # print(f'current room: {game_state.curr_room}')

@@ -41,12 +41,14 @@ class Creature(MyObject):
     def heal_hp(self, value):
         self.hp = min(self.max_hp, self.hp + value)
 
-    def take_damage(self, value, game_state, *, death = True):
+    def take_damage(self, value, game_state, *, death = True, temp_shield = None, temp_agility = None):
+        shield = temp_shield or self.shield
+        agility = temp_agility or self.agility
         min_hp = -1
         ui = game_state.UI
         if not death and self.hp != 1: min_hp = 1
-        damage = round(value*(1- (self.shield + getattr(self, 'shield_effect', 0))/100))
-        if random.randint(1, 100) <= self.agility:
+        damage = round(value*(1- shield/100))
+        if random.randint(1, 100) <= agility:
             damage = 0
             ui.say(f'{self.name} dodged the attack')
         self.hp = max(min_hp, self.hp - damage)
@@ -117,7 +119,7 @@ class Monster(Creature):
             game_state.player.fight_marker = False
             if self.after_death_act:
                 game_state = self.after_death_act.execute(game_state)
-            room.monster = None
+            room.monsters.remove(self)
         return game_state
 
     def __repr__(self):
