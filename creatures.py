@@ -6,11 +6,11 @@ from abstractions import MyObject
 
 class Creature(MyObject):
     DEFAULTS = dict(name = 'creature', attack = 1, max_attack = 999, shield = 0, max_shield = 999, hp = 10,
-                 max_hp = 999, agility = 0, max_agility = 999)
+                 max_hp = 999, agility = 0, max_agility = 999, behavior = (None, None, None))
     _registry = dict()
 
     def __init__(self, *, name = None, attack = None, max_attack = None, shield = None, max_shield = None, hp = None,
-                 max_hp = None, agility = None, max_agility = None, loot = None
+                 max_hp = None, agility = None, max_agility = None, loot = None, behavior = None
                  ):
         self.name = name if name is not None else self.DEFAULTS.get('name')
         self.attack = attack if attack is not None else self.DEFAULTS.get('attack')
@@ -26,6 +26,7 @@ class Creature(MyObject):
         self.after_death_act = None
         self.fight_marker = False
         self.open_bp = False
+        self.behavior = behavior if behavior is not None else self.DEFAULTS.get('behavior')
         if loot:
             self.back_pack.append(loot)
 
@@ -93,7 +94,7 @@ class Creature(MyObject):
 
 class Player(Creature):
     DEFAULTS = dict(attack = 15, max_attack = 100, shield = 20, max_shield = 50, hp = 100, max_hp = 100,
-                    agility = 10, max_agility = 40
+                    agility = 10, max_agility = 40, behavior = ('pl', None, None)
                     )
 
     def death_chek(self, game_state):
@@ -126,16 +127,16 @@ class Monster(Creature):
         return f'{self.name}'
 
 class Soldier(Monster):
-    DEFAULTS = dict(name = 'Soldier', attack = 7, shield = 10, hp = 50, agility = 5)
+    DEFAULTS = dict(name = 'Soldier', attack = 7, shield = 10, hp = 50, agility = 5, behavior = ('at', None, None))
 
 class Goblin(Monster):
     DEFAULTS = dict(name = 'Goblin', attack = 5, shield = 0, hp = 30, agility = 15)
 
 class Mage(Monster):
-    DEFAULTS = dict(name = 'Mage', attack = 12, shield = 5, hp = 40, agility = 0)
+    DEFAULTS = dict(name = 'Mage', attack = 12, shield = 5, hp = 40, agility = 0, behavior = ('mag', None, None))
 
 class Knight(Monster):
-    DEFAULTS = dict(name = 'Knight', attack = 9, shield = 20, hp = 70, agility = 5)
+    DEFAULTS = dict(name = 'Knight', attack = 9, shield = 20, hp = 70, agility = 5, behavior = ('def', None, None))
 
 class Mimic(Monster):
     DEFAULTS = dict(name = 'Mimic', attack = 8, shield = 15, hp = 60, agility = 10)

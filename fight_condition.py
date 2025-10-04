@@ -67,6 +67,12 @@ class FightService:
         return game_state
 
 
+    def behavior(self, creature):
+        pass
+
+    def choose_action(self, action_list):
+        return random.choice(action_list)
+
 class UnderEffects:
     def __init__(self):
         self.temp_shield = None
@@ -80,6 +86,30 @@ class UnderEffects:
         effects = self.__dict__.copy()
         self.set_effects()
         return effects
+
+class Behavior:
+    pass
+
+class PlayerBehavior(Behavior):
+    pass
+
+class DefaultBehavior(Behavior):
+    pass
+
+class AggressiveBehavior(Behavior):
+    pass
+
+class DefenceBehavior(Behavior):
+    pass
+
+class MageBehavior(Behavior):
+
+class BehaviorConstractor:
+    CHEK_DICT = {'pl': PlayerBehavior, None: DefaultBehavior, 'at': AggressiveBehavior, 'def': DefenceBehavior,
+                 'mag': MageBehavior
+                 }
+    def __init__(self):
+        pass
 
 class FightAction(Action):
     pass
