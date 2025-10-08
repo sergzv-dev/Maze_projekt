@@ -12,6 +12,7 @@ class FightCondition:
         self.queue = self.make_queue(self.creatures_list)
         self.effects_dict = self.make_effects_dict(self.creatures_list)
         self.targets_dict = self.make_targets_dict(self.creatures_list)
+        self.current_attacker = None
 
     @staticmethod
     def make_queue(sequence):
@@ -19,59 +20,68 @@ class FightCondition:
 
     @staticmethod
     def make_effects_dict(sequence):
-        return {creature: UnderEffects() for creature in sequence}
+        return {id(creature): UnderEffects() for creature in sequence}
 
     @staticmethod
     def make_targets_dict(sequence):
-        return {creature: None for creature in sequence}
+        return {id(creature): None for creature in sequence}
+
+    def take_next_creature(self):
+        creature = next(self.queue)
+        self.current_attacker = creature
+        return creature
+
+    def take_effects(self, creature):
+        return self.effects_dict[id(creature)]
+
+    def take_target(self, creature):
+        return self.targets_dict[id(creature)]
+
+    def set_target(self, creature, target):
+        self.targets_dict[id(creature)] = target
+
+    def win_check(self, game_state):
+        if not filter(lambda creature: not creature.death_marker, self.team2):
+            game_state.fight_state = None
+        return game_state
 
 
 class FightService:
-    def get_action(self):
-        actions = []
-        self.target_chek()
-        if not self.player.target:
-            actions.append(ChooseTarget())
-        actions += [ShowMonstersSpecs(), EscapeAction()]
+    def get_action(self, game_state):
+        player = game_state.player
+        fight_state = game_state.fight_state
+
+        self.manage_fight(game_state)
+        if player.death_marker:
+            return IngloriousDeath(game_state)
+
+        player_target = fight_state.take_target(player)
+        if not player_target:
+            action = ChooseTarget()
+            action.execute(game_state)
+
+        actions = [Attack(), StrongAttack(), DefenseAttack(), ChangeTarget(), EscapeAction()]
         return actions
 
     def target_chek(self):
         if self.player.target not in self.state.monster: self.player.target = None
 
-    def take_next_creature(self):
-        return next(self.queue)
 
-    def take_monster_action(self, creature):
-        pass
-
-    def start_fight(self):
-        return self.state
-
-    def monsters_move(self):
+    def manage_fight(self, game_state):
         while True:
-            creature = self.take_next_creature()
-            if creature == self.player: break
-            else: self.take_monster_action(creature)
+            creature = game_state.fight_state.take_next_creature()
+            if creature.death_marker: continue
+            elif creature is game_state.player: break
+            else: self.monster_move(creature)
 
-    def fight_execute(self, game_state):
-        player = game_state.player
-        player.fight_marker = True
-        monster = game_state.curr_room.monster
-        monster.take_damage(player.attack, game_state)
-        if monster.death_marker:
-            return game_state
-        if not monster.death_marker:
-            player.take_damage(monster.attack, game_state)
-        if player.death_marker:
-            return IngloriousDeath(game_state)
+    def monster_move(self, game_state):
+        fight_state = game_state.fight_state
+        monster = fight_state.current_attacker
+        target = fight_state.take_target(monster)
+        if not target: fight_state.set_target(monster, monster.target_behavior.get_target(game_state))
+        game_state = monster.behavior.get_fight_action(game_state).execute(game_state)
         return game_state
 
-
-    def behavior(self, creature):
-        pass
-
-    def choose_action(self, action_list):
-        return random.choice(action_list)
 
 class UnderEffects:
     def __init__(self):
@@ -82,34 +92,12 @@ class UnderEffects:
         self.temp_shield = temp_shield
         self.temp_agility = temp_agility
 
-    def aplay_effects(self):
-        effects = self.__dict__.copy()
+    def apply_effects(self):
+        temp_shield = self.temp_shield
+        temp_agility = self.temp_agility
         self.set_effects()
-        return effects
+        return temp_shield, temp_agility
 
-class Behavior:
-    pass
-
-class PlayerBehavior(Behavior):
-    pass
-
-class DefaultBehavior(Behavior):
-    pass
-
-class AggressiveBehavior(Behavior):
-    pass
-
-class DefenceBehavior(Behavior):
-    pass
-
-class MageBehavior(Behavior):
-
-class BehaviorConstractor:
-    CHEK_DICT = {'pl': PlayerBehavior, None: DefaultBehavior, 'at': AggressiveBehavior, 'def': DefenceBehavior,
-                 'mag': MageBehavior
-                 }
-    def __init__(self):
-        pass
 
 class FightAction(Action):
     pass
@@ -117,8 +105,10 @@ class FightAction(Action):
 class Attack(FightAction):
     def execute(self, game_state):
         player = game_state.player
-        player.target.take_damage(player.attack, game_state)
-        game_state.fight_action.monsters_move()
+        fight_state = game_state.fight_state
+        target = fight_state.take_target(player)
+        target.take_damage(player.attack)
+        game_state = fight_state.win_check(game_state)
         return game_state
 
     def __repr__(self):
@@ -159,6 +149,13 @@ class ChooseTarget(FightAction):
 
     def __repr__(self):
         return 'choose target monster'
+
+class ChangeTarget(FightAction):
+    def execute(self, game_state):
+        pass
+
+    def __repr__(self):
+        return 'change target monster'
 
 class ShowMonstersSpecs(FightAction):
     def execute(self, game_state):

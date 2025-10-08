@@ -12,7 +12,7 @@ from fight_condition import FightService
 
 def game():
     master = UI()
-    fight_service = FightService
+    fight_service = FightService()
     name = master.ask("What is your name? ")
     player = Player(name=name)
     quests = [MainQuest, ImmortalAmuletQuest]

@@ -3,14 +3,15 @@
 import random
 from item_container import ItemContainer
 from abstractions import MyObject
+from fight_actions import BasicBehaviour, AggressiveBehavior, PlayerBehavior, BasicChooseTarget
 
 class Creature(MyObject):
     DEFAULTS = dict(name = 'creature', attack = 1, max_attack = 999, shield = 0, max_shield = 999, hp = 10,
-                 max_hp = 999, agility = 0, max_agility = 999, behavior = (None, None, None))
+                 max_hp = 999, agility = 0, max_agility = 999, behavior = BasicBehaviour(), target_behavior = BasicChooseTarget())
     _registry = dict()
 
     def __init__(self, *, name = None, attack = None, max_attack = None, shield = None, max_shield = None, hp = None,
-                 max_hp = None, agility = None, max_agility = None, loot = None, behavior = None
+                 max_hp = None, agility = None, max_agility = None, loot = None, behavior = None, target_behavior = None,
                  ):
         self.name = name if name is not None else self.DEFAULTS.get('name')
         self.attack = attack if attack is not None else self.DEFAULTS.get('attack')
@@ -24,9 +25,9 @@ class Creature(MyObject):
         self.back_pack = ItemContainer()
         self.death_marker = False
         self.after_death_act = None
-        self.fight_marker = False
         self.open_bp = False
         self.behavior = behavior if behavior is not None else self.DEFAULTS.get('behavior')
+        self.target_behavior = target_behavior if target_behavior is not None else self.DEFAULTS.get('target_behavior')
         if loot:
             self.back_pack.append(loot)
 
@@ -55,6 +56,7 @@ class Creature(MyObject):
         self.hp = max(min_hp, self.hp - damage)
         ui.say(f'{self.name} received damage: {damage}')
         self.death_chek(game_state)
+        return game_state
 
     def increase_spec(self, spec, value):
         max_val = getattr(self, f'max_{spec}', float('inf'))
@@ -74,7 +76,6 @@ class Creature(MyObject):
 
         bp_data = data.pop('back_pack')
         back_pack = ItemContainer.from_json(bp_data)
-        fight_marker = data.pop('fight_marker')
         open_bp = data.pop('open_bp')
         death_marker = data.pop('death_marker')
         ada_sign = data.pop('after_death_act')
@@ -85,7 +86,6 @@ class Creature(MyObject):
         creature = cls_(**data)
 
         creature.back_pack = back_pack
-        creature.fight_marker = fight_marker
         creature.open_bp = open_bp
         creature.death_marker = death_marker
         creature.after_death_act = after_death_act
@@ -94,7 +94,7 @@ class Creature(MyObject):
 
 class Player(Creature):
     DEFAULTS = dict(attack = 15, max_attack = 100, shield = 20, max_shield = 50, hp = 100, max_hp = 100,
-                    agility = 10, max_agility = 40, behavior = ('pl', None, None)
+                    agility = 10, max_agility = 40, behavior = PlayerBehavior()
                     )
 
     def death_chek(self, game_state):
@@ -117,7 +117,7 @@ class Monster(Creature):
             if self.back_pack:
                 ui.say(f'the monster dropped the {self.back_pack[0]}')
                 room.loot += self.back_pack
-            game_state.player.fight_marker = False
+            self.death_marker = True
             if self.after_death_act:
                 game_state = self.after_death_act.execute(game_state)
             room.monsters.remove(self)
@@ -127,16 +127,16 @@ class Monster(Creature):
         return f'{self.name}'
 
 class Soldier(Monster):
-    DEFAULTS = dict(name = 'Soldier', attack = 7, shield = 10, hp = 50, agility = 5, behavior = ('at', None, None))
+    DEFAULTS = dict(name = 'Soldier', attack = 7, shield = 10, hp = 50, agility = 5, behavior = AggressiveBehavior())
 
 class Goblin(Monster):
     DEFAULTS = dict(name = 'Goblin', attack = 5, shield = 0, hp = 30, agility = 15)
 
 class Mage(Monster):
-    DEFAULTS = dict(name = 'Mage', attack = 12, shield = 5, hp = 40, agility = 0, behavior = ('mag', None, None))
+    DEFAULTS = dict(name = 'Mage', attack = 12, shield = 5, hp = 40, agility = 0)
 
 class Knight(Monster):
-    DEFAULTS = dict(name = 'Knight', attack = 9, shield = 20, hp = 70, agility = 5, behavior = ('def', None, None))
+    DEFAULTS = dict(name = 'Knight', attack = 9, shield = 20, hp = 70, agility = 5, behavior = AggressiveBehavior())
 
 class Mimic(Monster):
     DEFAULTS = dict(name = 'Mimic', attack = 8, shield = 15, hp = 60, agility = 10)

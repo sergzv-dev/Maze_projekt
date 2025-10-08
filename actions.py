@@ -177,7 +177,7 @@ class ActionProvider():
         if player.open_bp:
             return bp_actions + player.back_pack
         if game_state.fight_state:
-            fight_act = game_state.fight_state.get_action()
+            fight_act = game_state.fight_state.get_action(game_state)
             return fight_act + player_act
         return player_act + ActionProvider.room_act_gen(game_state) + opt_actions
 
