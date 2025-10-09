@@ -117,9 +117,9 @@ class Monster(Creature):
             if self.back_pack:
                 ui.say(f'the monster dropped the {self.back_pack[0]}')
                 room.loot += self.back_pack
-            self.death_marker = True
             if self.after_death_act:
                 game_state = self.after_death_act.execute(game_state)
+            self.death_marker = True
             room.monsters.remove(self)
         return game_state
 

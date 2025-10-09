@@ -11,7 +11,7 @@ class BasicBehaviour(Behavior):
 class AggressiveBehavior(Behavior):
     def get_fight_action(self, game_state):
         action = random.choice([BasicAttack(), StrongAttack()])
-        if game_state.fight_condition.current_attacker.hp < 15: action = BasicAttack()
+        if game_state.fight_state.current_attacker.hp < 15: action = BasicAttack()
         return action
 
 class PlayerBehavior(Behavior):

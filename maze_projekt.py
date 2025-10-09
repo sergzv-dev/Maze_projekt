@@ -19,11 +19,13 @@ def game():
     world_builder = WorldBuilder().add_rooms(10, 10).add_monsters().add_loot().add_quests(quests = quests)
     world = world_builder.build()
     curr_room = world.get_room('A1')
+    print(f'monsters: {world.amount_of_monsters()}')
+    print(f'boxes: {world.amount_of_boxes()}')
     game_state = GameState(master, world, player, curr_room, fight_service)
 
     while True:
         # print(f'current room: {game_state.curr_room}')
-        # print(f'monster: {game_state.curr_room.monster}')
+        print(f'monsters: {game_state.curr_room.monsters}')
         # print(f'loot: {game_state.curr_room.loot}')
         # print(f'hidden actions: {game_state.curr_room.hidden_actions}')
         # print(f'box: {game_state.curr_room.box}\n')

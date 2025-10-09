@@ -25,7 +25,7 @@ class World:
         return cls(rooms_dict)
 
     def amount_of_monsters(self):
-        return sum([1 for room in self.rooms_dict.values() if room.monster])
+        return sum([1 for room in self.rooms_dict.values() if room.monsters])
 
     def amount_of_boxes(self):
         return sum([1 for room in self.rooms_dict.values() if room.box])
@@ -84,7 +84,7 @@ class WorldBuilder:
         for room in rooms_dict.values():
             while random.random() < monster_probability:
                 loot = get_random_treasure() if random.random() < loot_probability else None
-                room.monster.append(get_random_monster(loot))
+                room.monsters.append(get_random_monster(loot))
         return rooms_dict
 
     @staticmethod

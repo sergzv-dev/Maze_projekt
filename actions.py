@@ -27,9 +27,9 @@ class SearchAction(Action):
             game_state.fight_state = FightCondition(game_state)
             ui.say('monsters suddenly attack you')
         elif room.quest:
-            if room.quest.sign == 'EndDoor':
+            if room.quest.quest_action == 'EndDoor':
                 ui.say('you find old dusty door')
-            if room.quest.sign == 'ImmortalAltar':
+            if room.quest.quest_action == 'ImmortalAltar':
                 ui.say('many candles in the room and circle of runes in the center')
         elif room.box:
             ui.say('this is looks like an old chest!')
@@ -177,7 +177,7 @@ class ActionProvider():
         if player.open_bp:
             return bp_actions + player.back_pack
         if game_state.fight_state:
-            fight_act = game_state.fight_state.get_action(game_state)
+            fight_act = game_state.fight_service.get_action(game_state)
             return fight_act + player_act
         return player_act + ActionProvider.room_act_gen(game_state) + opt_actions
 

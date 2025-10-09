@@ -7,7 +7,7 @@ class FightCondition:
     def __init__(self, game_state):
         self.player = game_state.player
         self.team1 = [game_state.player]
-        self.team2 = game_state.curr_room.monsters
+        self.team2 = list(game_state.curr_room.monsters)
         self.creatures_list = self.team1 + self.team2
         self.queue = self.make_queue(self.creatures_list)
         self.effects_dict = self.make_effects_dict(self.creatures_list)
@@ -37,11 +37,18 @@ class FightCondition:
     def take_target(self, creature):
         return self.targets_dict[id(creature)]
 
+    def take_possible_targets(self, creature):
+        if creature in self.team1: targets_list = self.team2
+        else: targets_list = self.team1
+        return list(filter(lambda obj: not obj.death_marker, targets_list))
+
     def set_target(self, creature, target):
         self.targets_dict[id(creature)] = target
 
     def win_check(self, game_state):
-        if not filter(lambda creature: not creature.death_marker, self.team2):
+        if getattr(self.take_target(self.player) ,'death_marker'):
+            self.targets_dict[id(self.player)] = None
+        if all(creature.death_marker for creature in self.team2):
             game_state.fight_state = None
         return game_state
 
@@ -60,7 +67,7 @@ class FightService:
             action = ChooseTarget()
             action.execute(game_state)
 
-        actions = [Attack(), StrongAttack(), DefenseAttack(), ChangeTarget(), EscapeAction()]
+        actions = [Attack()] #StrongAttack(), DefenseAttack(), ChangeTarget(), EscapeAction()
         return actions
 
     def target_chek(self):
@@ -72,7 +79,7 @@ class FightService:
             creature = game_state.fight_state.take_next_creature()
             if creature.death_marker: continue
             elif creature is game_state.player: break
-            else: self.monster_move(creature)
+            else: self.monster_move(game_state)
 
     def monster_move(self, game_state):
         fight_state = game_state.fight_state
@@ -107,12 +114,28 @@ class Attack(FightAction):
         player = game_state.player
         fight_state = game_state.fight_state
         target = fight_state.take_target(player)
-        target.take_damage(player.attack)
+        target.take_damage(player.attack, game_state)
         game_state = fight_state.win_check(game_state)
         return game_state
 
     def __repr__(self):
         return f'attack the monster'
+
+
+class ChooseTarget(FightAction):
+    def execute(self, game_state):
+        ui = game_state.UI
+        player = game_state.player
+        target_list = game_state.fight_state.take_possible_targets(player)
+        ui.say('which monster do you want to attack?')
+        target = ui.choose(target_list)
+        game_state.fight_state.set_target(player, target)
+        return game_state
+
+    def __repr__(self):
+        return 'choose target monster'
+
+########################################### TODO
 
 class StrongAttack(FightAction):
     def execute(self, game_state):
@@ -136,19 +159,6 @@ class DefenseAttack(FightAction):
     def __repr__(self):
         return f'make defense attack'
 
-
-class ChooseTarget(FightAction):
-    def execute(self, game_state):
-        ui = game_state.UI
-        player = game_state.player
-        target_list = game_state.fight_action.team2
-        ui.say('which monster do you want to attack?')
-        target = ui.choose(target_list)
-        player.target = target
-        return game_state
-
-    def __repr__(self):
-        return 'choose target monster'
 
 class ChangeTarget(FightAction):
     def execute(self, game_state):
