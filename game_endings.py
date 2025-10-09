@@ -18,7 +18,7 @@ class IngloriousDeath(EndGame):
         ui = game_state.UI
         room = game_state.curr_room
         ui.say('You died ingloriously in the dungeon')
-        ui.say(f'{room.monster} taste your delicious flesh..')
+        ui.say(f'{room.monsters[0]} taste your delicious flesh..')
 
 class MissingInMase(EndGame):
     def __init__(self, game_state):

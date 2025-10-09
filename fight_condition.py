@@ -60,7 +60,7 @@ class FightService:
 
         self.manage_fight(game_state)
         if player.death_marker:
-            return IngloriousDeath(game_state)
+            return [DeathAction()]
 
         player_target = fight_state.take_target(player)
         if not player_target:
@@ -70,15 +70,11 @@ class FightService:
         actions = [Attack()] #StrongAttack(), DefenseAttack(), ChangeTarget(), EscapeAction()
         return actions
 
-    def target_chek(self):
-        if self.player.target not in self.state.monster: self.player.target = None
-
-
     def manage_fight(self, game_state):
         while True:
             creature = game_state.fight_state.take_next_creature()
-            if creature.death_marker: continue
-            elif creature is game_state.player: break
+            if creature is game_state.player: break
+            elif creature.death_marker: continue
             else: self.monster_move(game_state)
 
     def monster_move(self, game_state):
@@ -135,6 +131,12 @@ class ChooseTarget(FightAction):
     def __repr__(self):
         return 'choose target monster'
 
+class DeathAction(FightAction):
+    def execute(self, game_state):
+        return IngloriousDeath(game_state)
+
+    def __repr__(self):
+        return 'you fought bravely.. but..'
 ########################################### TODO
 
 class StrongAttack(FightAction):
