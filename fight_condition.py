@@ -60,7 +60,7 @@ class FightService:
 
         self.manage_fight(game_state)
         if player.death_marker:
-            return [DeathAction()]
+            game_state = IngloriousDeath(game_state)
 
         player_target = fight_state.take_target(player)
         if not player_target:
@@ -131,13 +131,7 @@ class ChooseTarget(FightAction):
     def __repr__(self):
         return 'choose target monster'
 
-class DeathAction(FightAction):
-    def execute(self, game_state):
-        return IngloriousDeath(game_state)
-
-    def __repr__(self):
-        return 'you fought bravely.. but..'
-########################################### TODO
+###########################################
 
 class StrongAttack(FightAction):
     def execute(self, game_state):

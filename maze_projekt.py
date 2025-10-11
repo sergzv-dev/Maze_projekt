@@ -4,7 +4,7 @@ from creatures import Player
 from ui_terminal import UI
 from map_builder import WorldBuilder
 from game_states import GameState
-from game_endings import EndGame
+from game_endings import GameOver
 from actions import ActionProvider
 from quests import MainQuest, ImmortalAmuletQuest
 from fight_condition import FightService
@@ -24,15 +24,16 @@ def game():
     game_state = GameState(master, world, player, curr_room, fight_service)
 
     while True:
-        # print(f'current room: {game_state.curr_room}')
-        print(f'monsters: {game_state.curr_room.monsters}')
-        # print(f'loot: {game_state.curr_room.loot}')
-        # print(f'hidden actions: {game_state.curr_room.hidden_actions}')
-        # print(f'box: {game_state.curr_room.box}\n')
+        try:
+            # print(f'current room: {game_state.curr_room}')
+            print(f'monsters: {game_state.curr_room.monsters}')
+            # print(f'loot: {game_state.curr_room.loot}')
+            # print(f'hidden actions: {game_state.curr_room.hidden_actions}')
+            # print(f'box: {game_state.curr_room.box}\n')
 
-        actions = ActionProvider.provide_action(game_state)
-        action = master.choose(actions)
-        game_state = action.execute(game_state)
-        if isinstance(game_state, EndGame): break
+            actions = ActionProvider.provide_action(game_state)
+            action = master.choose(actions)
+            game_state = action.execute(game_state)
+        except GameOver: break
 
 game()

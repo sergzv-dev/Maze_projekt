@@ -1,5 +1,8 @@
 '''Options of end game'''
 
+class GameOver(Exception):
+    pass
+
 class EndGame():
     def __init__(self, game_state):
         self.state = game_state
@@ -11,6 +14,7 @@ class HappyEnd(EndGame):
         player = game_state.player
         ui.say('Congratulations you find an exit!!')
         ui.say(f'hp: {player.hp}')
+        raise GameOver
 
 class IngloriousDeath(EndGame):
     def __init__(self, game_state):
@@ -19,6 +23,7 @@ class IngloriousDeath(EndGame):
         room = game_state.curr_room
         ui.say('You died ingloriously in the dungeon')
         ui.say(f'{room.monsters[0]} taste your delicious flesh..')
+        raise GameOver
 
 class MissingInMase(EndGame):
     def __init__(self, game_state):
@@ -26,3 +31,4 @@ class MissingInMase(EndGame):
         ui = game_state.UI
         player = game_state.player
         ui.say(f'{player.name} disappeared into the maze and was never seen again..')
+        raise GameOver

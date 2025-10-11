@@ -36,11 +36,7 @@ class BasicChooseTarget(TargetBehaviour):
 
 
 class MonsterFightAction:
-    def execute(self, game_state) -> 'GameState':
-        pass
-
-    @staticmethod
-    def make_hit(game_state, attack_mult = 1, set_shield = None, set_agility = None):
+    def execute(self, game_state, *, attack_mult = 1, set_shield = None, set_agility = None) -> 'GameState':
         fight_state = game_state.fight_state
         attacker = fight_state.current_attacker
         defender = fight_state.take_target(attacker)
@@ -57,12 +53,10 @@ class MonsterFightAction:
 
 
 class BasicAttack(MonsterFightAction):
-    def execute(self, game_state) -> 'GameState':
-        game_state = self.make_hit(game_state)
-        return game_state
+    def execute(self, game_state, *, attack_mult = 1, set_shield = None, set_agility = None) -> 'GameState':
+        super().execute(game_state)
 
 class StrongAttack(MonsterFightAction):
-    def execute(self, game_state) -> 'GameState':
+    def execute(self, game_state, *, attack_mult = 1, set_shield = None, set_agility = None) -> 'GameState':
         attacker = game_state.fight_state.current_attacker
-        game_state = self.make_hit(game_state, attack_mult = 2, set_shield = attacker.shield/2)
-        return game_state
+        super().execute(game_state, attack_mult = 2, set_shield = attacker.shield/2)
